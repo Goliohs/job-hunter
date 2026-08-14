@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Jobs</h1>
+    <p class="text-gray-600 mt-1">{{ total }} jobs encontrados</p>
+</div>
+
+<div class="flex flex-col sm:flex-row gap-4 mb-6">
+    <div class="flex-1">
+        <input type="text" name="search" id="search" value="{{ search or '' }}"
+               placeholder="Buscar por título, empresa, descripción..."
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+               hx-get="/jobs/fragment" hx-target="#jobs-table" hx-trigger="keyup changed delay:300ms"
+               hx-include="[name='status'],[name='score_min'],[name='source'],[name='page']"
+               placeholder="Buscar por título, empresa, descripción...">
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a href="/jobs" class="px-3 py-1.5 text-sm {% if not status %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg">Todos</a>
+        <a href="/jobs?status=new" class="px-3 py-1.5 text-sm {% if status == 'new' %}bg-green-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg">Nuevos</a>
+        <a href="/jobs?status=rejected" class="px-3 py-1.5 text-sm {% if status == 'rejected' %}bg-red-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg">Rechazados</a>
+        <a href="/jobs?status=applied" class="px-3 py-1.5 text-sm {% if status == 'applied' %}bg-purple-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg">Aplicados</a>
+        <a href="/jobs?status=interviewing" class="px-3 py-1.5 text-sm {% if status == 'interviewing' %}bg-yellow-600 text-white{% else %}bg-gray-100 text-gray-700{% endif %} rounded-lg">En proceso</a>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-4">
+        <select name="score_min" id="score_min"
+                hx-get="/jobs/fragment"
+                hx-target="#jobs-table"
+                hx-include="[name='status'],[name='source'],[name='search'],[name='page']"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Min Score: Todos</option>
+            <option value="0" {% if score_min == 0 %}selected{% endif %}>≥ 0</option>
+            <option value="50" {% if score_min == 50 %}selected{% endif %}>≥ 50</option>
+            <option value="60" {% if score_min == 60 %}selected{% endif %}>≥ 60</option>
+            <option value="70" {% if score_min == 70 %}selected{% endif %}>≥ 70</option>
+            <option value="80" {% if score_min == 80 %}selected{% endif %}>≥ 80</option>
+            <option value="90" {% if score_min == 90 %}selected{% endif %}>≥ 90</option>
+        </select>
+
+        <select name="source" id="source"
+                hx-get="/jobs/fragment"
+                hx-target="#jobs-table"
+                hx-include="[name='status'],[name='score_min'],[name='search'],[name='page']"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Fuente: Todas</option>
+            <option value="remotive" {% if source == 'remotive' %}selected{% endif %}>Remotive</option>
+            <option value="remoteok" {% if source == 'remoteok' %}selected{% endif %}>RemoteOK</option>
+            <option value="weworkremotely" {% if source == 'weworkremotely' %}selected{% endif %}>WeWorkRemotely</option>
+            <option value="hackernews" {% if source == 'hackernews' %}selected{% endif %}>Hacker News</option>
+        </select>
+
+        <a href="/jobs" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-200">Limpiar filtros</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div id="jobs-table" hx-get="/jobs/fragment" hx-trigger="load" hx-target="this" hx-include="[name='status'],[name='score_min'],[name='source'],[name='search'],[name='page']">
+            <div class="px-6 py-4 text-center text-gray-500">Cargando...</div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Quick Apply - {{ job.title }} at {{ job.company }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="mb-6 flex justify-between items-start">
+        <div>
+            <a href="/jobs/{{ job.id }}" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">← Volver al job</a>
+            <h1 class="text-3xl font-bold text-gray-900">Quick Apply: {{ job.title }}</h1>
+            <p class="text-gray-600 mt-1">{{ job.company }} • Match: {{ job.match_score }}/100</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Cover Letter -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-900">Cover Letter</h2>
+                <p class="text-sm text-gray-500 mt-1">Asunto: {{ package.subject_line or 'Aplicación: ' ~ job.title }}</p>
+            </div>
+            <div class="p-6">
+                {% if package.cover_letter %}
+                <div class="prose max-w-none whitespace-pre-wrap text-gray-800 bg-gray-50 p-4 rounded-lg border">{{ package.cover_letter }}</div>
+                {% else %}
+                <p class="text-gray-500 text-center py-8">No se pudo generar la cover letter</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Adapted CV -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="p-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-900">CV Adaptado</h2>
+                {% if package.cv_changes_summary %}
+                <p class="text-sm text-green-600 mt-1">{{ package.cv_changes_summary }}</p>
+                {% endif %}
+            </div>
+            <div class="p-6">
+                {% if package.adapted_cv %}
+                <div class="prose max-w-none whitespace-pre-wrap text-gray-800 bg-gray-50 p-4 rounded-lg border">{{ package.adapted_cv }}</div>
+                {% else %}
+                <p class="text-gray-500 text-center py-8">No se pudo adaptar el CV</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Match Points -->
+    {% if package.key_match_points %}
+    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="font-semibold text-green-800 mb-2">Puntos clave de match (para entrevista)</h3>
+        <ul class="list-disc list-inside text-green-700 space-y-1">
+            {% for point in package.key_match_points %}
+            <li>{{ point }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="mt-6 flex flex-wrap gap-4">
+        <a href="/jobs/{{ job.id }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Volver</a>
+        <a href="{{ job.url }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Abrir oferta en origen</a>
+        
+        <!-- Update status to applied -->
+        <button 
+            hx-post="/api/jobs/{{ job.id }}/status" 
+            hx-vals='{"status": "applied"}'
+            hx-target="#status-badge"
+            hx-swap="outerHTML"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            Marcar como Aplicado
+        </button>
+        
+        <!-- Generate PDFs -->
+        <button 
+            hx-post="/api/jobs/{{ job.id }}/generate-pdfs"
+            hx-target="#pdf-result"
+            hx-swap="innerHTML"
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+            Generar PDFs
+        </button>
+    </div>
+
+    <div id="pdf-result" class="mt-4"></div>
+
+    <!-- Hidden status badge for HTMX update -->
+    <div id="status-badge" class="hidden">
+        <span class="status-badge status-applied">Aplicado</span>
+    </div>
+</div>
+{% endblock %}

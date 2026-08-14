@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.env
+.venv/
+venv/
+*.egg-info/
+
+# Data
+jobs.db
+chroma-data/
+*.sqlite3
+
+# Output
+*.png
+*.pdf
+/tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

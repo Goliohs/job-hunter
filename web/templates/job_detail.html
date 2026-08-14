@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="mb-6 flex justify-between items-start">
+        <div>
+            <a href="/jobs" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">← Volver</a>
+            <h1 class="text-3xl font-bold text-gray-900">{{ job.title }}</h1>
+            <p class="text-gray-600 mt-1">{{ job.company }} • {{ job.source }}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ job.url }}" target="_blank"
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Ver en origen</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-4 rounded-lg border border-gray-200">
+            <p class="text-sm text-gray-500">Match Score</p>
+            <p class="text-3xl font-bold {% if job.match_score >= 80 %}text-emerald-600{% elif job.match_score >= 60 %}text-green-600{% elif job.match_score >= 40 %}text-yellow-600{% else %}text-red-600{% endif %}">{{ job.match_score }}/100</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg border border-gray-200">
+            <p class="text-sm text-gray-500">Estado</p>
+            <select name="status" hx-post="/api/jobs/{{ job.id }}/status" hx-target="this" hx-swap="outerHTML"
+                    class="mt-1 w-full px-3 py-2 border rounded-lg">
+                <option value="new" {% if job.status == 'new' %}selected{% endif %}>Nuevo</option>
+                <option value="viewed" {% if job.status == 'viewed' %}selected{% endif %}>Visto</option>
+                <option value="applied" {% if job.status == 'applied' %}selected{% endif %}>Aplicado</option>
+                <option value="interviewing" {% if job.status == 'interviewing' %}selected{% endif %}>En proceso</option>
+                <option value="rejected" {% if job.status == 'rejected' %}selected{% endif %}>Rechazado</option>
+                <option value="offer" {% if job.status == 'offer' %}selected{% endif %}>Oferta</option>
+            </select>
+        </div>
+        <div class="bg-white p-4 rounded-lg border border-gray-200">
+            <p class="text-sm text-gray-500">Publicado</p>
+            <p class="text-lg font-medium">{{ job.posted_date[:10] if job.posted_date else 'Desconocido' }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold">Descripción completa</h2>
+        </div>
+        <div class="p-6">
+            <div class="prose max-w-none whitespace-pre-wrap text-gray-800">{{ job.description }}</div>
+        </div>
+    </div>
+
+    {% if job.match_reason %}
+    <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="font-semibold text-green-800 mb-2">Análisis del LLM</h3>
+        <p class="text-green-700">{{ job.match_reason }}</p>
+    </div>
+    {% endif %}
+
+{% if job.dealbreaker_hit %}
+    <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+        <h3 class="font-semibold text-red-800 mb-2">Dealbreaker detectado</h3>
+        <p class="text-red-700">{{ job.dealbreaker_hit }}</p>
+    </div>
+{% endif %}
+
+<div class="mt-6 bg-gray-50 rounded-lg p-4 text-sm">
+    <dl class="grid grid-cols-2 gap-4">
+        <dt class="text-gray-500">ID</dt><dd>{{ job.id }}</dd>
+        <dt class="text-gray-500">External ID</dt><dd>{{ job.external_id }}</dd>
+        <dt class="text-gray-500">Fuente</dt><dd>{{ job.source }}</dd>
+        <dt class="text-gray-500">Ubicación</dt><dd>{{ job.location }}</dd>
+        <dt class="text-gray-500">Remote</dt><dd>{% if job.remote %}Sí{% else %}No{% endif %}</dd>
+        <dt class="text-gray-500">Salario</dt><dd>{{ job.salary or 'No especificado' }}</dd>
+        <dt class="text-gray-500">Tags</dt><dd>{{ job.tags }}</dd>
+    </dl>
+</div>
+
+<!-- Notes Section -->
+<div class="mt-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Notas y Seguimiento</h2>
+    
+    <!-- Add note form -->
+    <form hx-post="/api/jobs/{{ job.id }}/notes" hx-target="#notes-list" hx-swap="beforeend" class="mb-4">
+        <div class="flex gap-2 mb-3">
+            <select name="note_type" class="px-3 py-2 border border-gray-300 rounded-lg text-sm w-40" name="note_type">
+                <option value="general">General</option>
+                <option value="interview">Entrevista</option>
+                <option value="followup">Seguimiento</option>
+                <option value="offer">Oferta</option>
+                <option value="rejection">Rechazo</option>
+            </select>
+            <textarea name="note" placeholder="Escribe una nota..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" rows="2" required></textarea>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Añadir</button>
+        </div>
+    </form>
+    
+    <!-- Notes list -->
+    <div id="notes-list" class="space-y-3">
+        {% if notes %}
+            {% for note in notes %}
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">{{ note.note_type }}</span>
+                    <span class="text-xs text-gray-400">{{ note.created_at[:16] }}</span>
+                </div>
+                <p class="text-gray-800 text-sm">{{ note.note }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p class="text-gray-500 text-sm text-center py-4">Sin notas aún. Añade tu primera nota arriba.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

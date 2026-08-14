@@ -1,0 +1,93 @@
+{% if jobs %}
+<table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+        <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fuente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        {% for job in jobs %}
+        <tr class="hover:bg-gray-50 {% if job.match_score >= 80 %}bg-emerald-50{% elif job.match_score >= 60 %}bg-green-50{% elif job.status == 'rejected' %}bg-red-50{% endif %}">
+            <td class="px-4 py-3 whitespace-nowrap">
+                {% if job.match_score > 0 %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    {% if job.match_score >= 80 %}bg-emerald-100 text-emerald-800
+                    {% elif job.match_score >= 60 %}bg-green-100 text-green-800
+                    {% elif job.match_score >= 40 %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-red-100 text-red-800{% endif %}">
+                    {{ job.match_score }}
+                </span>
+                {% else %}
+                <span class="text-gray-400 text-sm">—</span>
+                {% endif %}
+            </td>
+            <td class="px-4 py-3">
+                <a href="{{ job.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium truncate block max-w-xs">
+                    {{ job.title }}
+                </a>
+            </td>
+            <td class="px-4 py-3 text-gray-900">{{ job.company }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-medium rounded
+                    {% if job.source == 'hackernews' %}bg-orange-100 text-orange-800
+                    {% elif job.source == 'remotive' %}bg-blue-100 text-blue-800
+                    {% elif job.source == 'remoteok' %}bg-purple-100 text-purple-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ job.source }}
+                </span>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <select name="status" hx-post="/api/jobs/{{ job.id }}/status" hx-target="closest tr" hx-swap="outerHTML"
+                    class="px-2 py-1 text-xs border rounded {% if job.status == 'new' %}bg-blue-50 text-blue-800
+                        {% elif job.status == 'viewed' %}bg-indigo-50 text-indigo-800
+                        {% elif job.status == 'applied' %}bg-purple-50 text-purple-800
+                        {% elif job.status == 'interviewing' %}bg-orange-50 text-orange-800
+                        {% elif job.status == 'rejected' %}bg-red-50 text-red-800
+                        {% elif job.status == 'offer' %}bg-green-50 text-green-800{% endif %}">
+                    <option value="new" {% if job.status == 'new' %}selected{% endif %}>Nuevo</option>
+                    <option value="viewed" {% if job.status == 'viewed' %}selected{% endif %}>Visto</option>
+                    <option value="applied" {% if job.status == 'applied' %}selected{% endif %}>Aplicado</option>
+                    <option value="interviewing" {% if job.status == 'interviewing' %}selected{% endif %}>En proceso</option>
+                    <option value="rejected" {% if job.status == 'rejected' %}selected{% endif %}>Rechazado</option>
+                    <option value="offer" {% if job.status == 'offer' %}selected{% endif %}>Oferta</option>
+                </select>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                <a href="{{ job.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 mr-3">Abrir</a>
+                <a href="/jobs/{{ job.id }}/quick-apply" class="text-green-600 hover:text-green-800 ml-3" hx-get="/jobs/{{ job.id }}/quick-apply" hx-target="#quick-apply-modal" hx-swap="innerHTML">Quick Apply</a>
+                {% if job.match_reason %}
+                <button onclick="alert(`{{ job.match_reason | replace('"', '\\"') }}`)" class="text-gray-600 hover:text-gray-800">Razón</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+    <p class="text-sm text-gray-600">Mostrando {{ (page - 1) * 20 + 1 }} - {{ (page - 1) * 20 + jobs|length }} de {{ total }}</p>
+    <div class="flex gap-2">
+        {% if page > 1 %}
+        <a href="#" hx-get="/jobs/fragment?page={{ page - 1 }}&status={{ status }}&score_min={{ score_min }}&source={{ source }}&search={{ search }}"
+           hx-target="#jobs-table" class="px-3 py-1 border rounded hover:bg-gray-100">← Anterior</a>
+        {% endif %}
+        {% if page < total_pages %}
+        <a href="#" hx-get="/jobs/fragment?page={{ page + 1 }}&status={{ status }}&score_min={{ score_min }}&source={{ source }}&search={{ search }}"
+           hx-target="#jobs-table" class="px-3 py-1 border rounded hover:bg-gray-100">Siguiente →</a>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="px-6 py-12 text-center">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No hay jobs</h3>
+    <p class="mt-1 text-sm text-gray-500">Prueba cambiando los filtros o ejecuta el pipeline.</p>
+</div>
+{% endif %}
