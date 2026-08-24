@@ -410,7 +410,7 @@ if __name__ == "__main__":
             "email": "oscar@example.com",
             "phone": "+506 1234 5678",
             "linkedin": "https://linkedin.com/in/tuusuario",
-            "github": "https://github.com/Goliohs",
+            "github": "https://github.com/tuusuario",
             "portfolio": "https://services.o7team.us",
             "cover_letter": "Experienced DevOps Architect...",
         }
