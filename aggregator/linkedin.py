@@ -4,6 +4,7 @@ import feedparser
 from typing import List, Dict, Optional
 from datetime import datetime
 import re
+from bs4 import BeautifulSoup
 
 
 LINKEDIN_SEARCH_URLS = {

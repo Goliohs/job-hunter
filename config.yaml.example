@@ -1,0 +1,283 @@
+profile:
+  name: Tu Nombre
+  first_name: Tu
+  last_name: Nombre
+  email: tu@email.com
+  phone: +00 00000000
+  linkedin: https://linkedin.com/in/tuusuario
+  github: https://github.com/tuusuario
+  portfolio: https://tuportfolio.com
+  cover_letter: 'Breve resumen profesional: años de experiencia, stack principal,
+    diferenciadores.'
+  visa_status: No visa required for remote work
+  notice_period: Immediate
+  salary_expectation: Negotiable
+  target_roles:
+  - DevOps Engineer
+  - Platform Engineer
+  - SRE
+  max_years_experience: 15
+  skills:
+  - Docker
+  - Kubernetes
+  - Linux
+  - Python
+  remote_only: true
+  worldwide: true
+  dealbreakers:
+  - onsite
+  - hybrid
+  - relocation required
+  - junior
+  preferences:
+  - remote
+  - worldwide
+  - async
+sources:
+  remotive:
+    enabled: true
+    url: https://remotive.com/api/remote-jobs
+    categories:
+    - software-dev
+    - web-development
+    - backend
+    - frontend
+    - fullstack
+    - devops
+    - sysadmin
+    - data
+  remoteok:
+    enabled: true
+    url: https://remoteok.com/api
+  weworkremotely:
+    enabled: true
+    url: https://weworkremotely.com/categories/remote-programming-jobs.rss
+  hackernews:
+    enabled: true
+    base_url: https://news.ycombinator.com
+  greenhouse:
+    enabled: true
+    urls: &id001
+    - https://job-boards.greenhouse.io/clickhouse
+    - https://job-boards.greenhouse.io/planetscale
+    - https://job-boards.greenhouse.io/canonical
+    - https://job-boards.greenhouse.io/pagerduty
+    - https://job-boards.greenhouse.io/gitlab
+    - https://job-boards.greenhouse.io/vercel
+    - https://job-boards.greenhouse.io/singlestore
+    - https://job-boards.greenhouse.io/cockroachdb
+    - https://job-boards.greenhouse.io/timescale
+    - https://job-boards.greenhouse.io/materialize
+    - https://job-boards.greenhouse.io/tinybird
+    - https://job-boards.greenhouse.io/cloudflare
+    - https://job-boards.greenhouse.io/mongodb
+    - https://job-boards.greenhouse.io/datadog
+    - https://job-boards.greenhouse.io/elastic
+    - https://job-boards.greenhouse.io/stripe
+    - https://job-boards.greenhouse.io/airtable
+    - https://job-boards.greenhouse.io/cockroachdb
+    - https://job-boards.greenhouse.io/singlestore
+    - https://job-boards.greenhouse.io/timescale
+    - https://job-boards.greenhouse.io/materialize
+    - https://job-boards.greenhouse.io/tinybird
+  ashby:
+    enabled: true
+    urls: &id003
+    - https://jobs.ashbyhq.com/supabase
+    - https://jobs.ashbyhq.com/clickhouse
+    - https://jobs.ashbyhq.com/snowflake
+    - https://jobs.ashbyhq.com/vercel
+    - https://jobs.ashbyhq.com/planetscale
+    - https://jobs.ashbyhq.com/railway
+    - https://jobs.ashbyhq.com/render
+    - https://jobs.ashbyhq.com/fly.io
+    - https://jobs.ashbyhq.com/cloudflare
+    - https://jobs.ashbyhq.com/mongodb
+    - https://jobs.ashbyhq.com/redis
+    - https://jobs.ashbyhq.com/canonical
+    - https://jobs.ashbyhq.com/cockroachdb
+    - https://jobs.ashbyhq.com/timescale
+    - https://jobs.ashbyhq.com/materialize
+    - https://jobs.ashbyhq.com/tinybird
+    - https://jobs.ashbyhq.com/grafana
+    - https://jobs.ashbyhq.com/confluent
+    - https://jobs.ashbyhq.com/pagerduty
+    - https://jobs.ashbyhq.com/gitlab
+    - https://jobs.ashbyhq.com/datadog
+    - https://jobs.ashbyhq.com/elastic
+    - https://jobs.ashbyhq.com/hashicorp
+    - https://jobs.ashbyhq.com/stripe
+    - https://jobs.ashbyhq.com/airtable
+  lever:
+    enabled: true
+    urls: &id002
+    - https://jobs.lever.co/tinybird
+  company_career_pages:
+    enabled: true
+    urls:
+    - https://jobs.vercel.com
+    - https://jobs.supabase.com
+    - https://jobs.planetscale.com
+    - https://jobs.railway.app
+    - https://jobs.render.com
+    - https://jobs.fly.io
+    - https://jobs.cloudflare.com
+    - https://jobs.mongodb.com
+    - https://jobs.redis.io
+    - https://jobs.canonical.com
+    - https://jobs.elastic.co
+    - https://jobs.hashicorp.com
+    - https://jobs.datadoghq.com
+    - https://jobs.snowflake.com
+    - https://jobs.stripe.com
+    - https://jobs.airtable.com
+    - https://jobs.notion.so
+    - https://jobs.linear.app
+    - https://jobs.vercel.com
+    - https://jobs.planetscale.com
+    - https://jobs.railway.app
+    - https://jobs.render.com
+    - https://jobs.fly.io
+    - https://jobs.cloudflare.com
+    - https://jobs.mongodb.com
+    - https://jobs.redis.io
+    - https://jobs.canonical.com
+    - https://jobs.elastic.co
+    - https://jobs.hashicorp.com
+    - https://jobs.datadoghq.com
+    - https://jobs.snowflake.com
+    - https://jobs.stripe.com
+    - https://jobs.airtable.com
+    - https://jobs.notion.so
+    - https://jobs.linear.app
+  linkedin:
+    enabled: true
+    searches:
+      devops_remote: https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=devops%20OR%20site%20reliability%20OR%20platform%20engineer&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0
+      fullstack_remote: https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=full%20stack%20OR%20backend%20OR%20python%20OR%20golang&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0
+      ai_ml_remote: https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=ai%20OR%20machine%20learning%20OR%20llm%20OR%20mlops&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0
+      frontend_remote: https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=react%20OR%20frontend%20OR%20typescript&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0
+  linkedin_easy_apply:
+    enabled: true
+    keywords:
+    - devops
+    - site reliability
+    - platform engineer
+    - kubernetes
+    - python
+    - golang
+    - devops engineer
+    - sre
+    - devsecops
+    location: Remote
+    max_pages: 3
+  standard_ats:
+    enabled: true
+    keywords:
+    - devops
+    - kubernetes
+    - python
+    - golang
+    - sre
+    - devops engineer
+    - platform engineer
+    - devsecops
+    location: Remote
+  wellfound:
+    enabled: false
+    search_urls:
+    - https://wellfound.com/jobs?locations[]=Remote&roles[]=Software%20Engineer&roles[]=DevOps%20Engineer&roles[]=Data%20Engineer&roles[]=Backend%20Engineer&roles[]=Fullstack%20Engineer&roles[]=Platform%20Engineer&roles[]=SRE
+    - https://wellfound.com/jobs?locations[]=Remote&roles[]=Engineering%20Manager&roles[]=CTO&roles[]=VP%20Engineering&roles[]=Staff%20Engineer&roles[]=Principal%20Engineer
+    - https://wellfound.com/jobs?locations[]=Remote&roles[]=AI%20Engineer&roles[]=ML%20Engineer&roles[]=Data%20Scientist
+    max_pages: 3
+  yc_jobs:
+    enabled: false
+    max_pages: 5
+  wellfound_pw:
+    enabled: true
+    max_pages: 3
+  yc_jobs_pw:
+    enabled: true
+    max_pages: 3
+  ats_career_pages:
+    enabled: true
+    greenhouse: *id001
+    lever: *id002
+    ashby: *id003
+llm:
+  api_url: https://integrate.api.nvidia.com/v1/chat/completions
+  api_key_env: NIM_API_KEY
+  model: meta/llama-3.1-70b-instruct
+  temperature: 0.3
+  max_tokens: 500
+filter:
+  min_score: 60
+  high_match_threshold: 70
+  max_jobs_per_run: 5
+database:
+  path: jobs.db
+alerts:
+  telegram:
+    enabled: false
+    bot_token_env: TELEGRAM_BOT_TOKEN
+    chat_id_env: TELEGRAM_CHAT_ID
+  email:
+    enabled: false
+    smtp_host: smtp.gmail.com
+    smtp_port: 587
+    username_env: SMTP_USER
+    password_env: SMTP_PASS
+    from_email_env: ALERT_FROM_EMAIL
+    to_emails_env: ALERT_TO_EMAILS
+auto_apply:
+  enabled: false
+  max_per_day: 5
+  ats_platforms:
+  - lever
+  - greenhouse
+  - ashby
+generator:
+  cover_letter_template: 'Estimado equipo de {company},
+
+
+    Me dirijo a ustedes como {candidate_summary}. Me emociona la oportunidad de unirme
+    a su equipo como {job_title}.
+
+
+    Destacaría mi experiencia en {top_skills}, que se alinea perfectamente con los
+    requisitos de la oferta. Además, mi experiencia con infraestructura propia (homelab,
+    GPU nodes, bare metal) y Private AI (Ollama, local LLMs) me permite ofrecer una
+    perspectiva única.
+
+
+    Me gustaría solicitar una entrevista técnica para discutir cómo puedo aportar
+    valor.
+
+
+    Atentamente,
+
+    {candidate_name}
+
+    '
+  cv_template: '{candidate_name}
+
+    Email: {email} | Phone: {phone}
+
+    LinkedIn: {linkedin} | GitHub: {github}
+
+    Portfolio: {portfolio}
+
+
+    EXPERIENCE:
+
+    {experience}
+
+
+    SKILLS:
+
+    {skills}
+
+
+    EDUCATION:
+
+    {education}'

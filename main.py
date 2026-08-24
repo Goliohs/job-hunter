@@ -11,6 +11,7 @@ import sys
 import os
 import time
 import yaml
+import asyncio
 from pathlib import Path
 from typing import Optional
 
@@ -21,7 +22,10 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
 from db.store import init_db, save_job, update_match, get_stats, get_top_jobs, log_run, get_jobs_for_apply
-from aggregator import remotive, remoteok, wwr, hn, ats_career, company_career, lever
+from aggregator import remotive, remoteok, wwr, hn, ats_career, company_career, lever, wellfound, yc_jobs, playwright_scraper
+from aggregator.linkedin import fetch_all_linkedin_jobs
+from aggregator.linkedin_easy_apply import fetch_linkedin_jobs
+from aggregator.standard_ats import fetch_all_standard_ats_jobs
 from filter.matcher import filter_job
 from alerts.telegram import alert_high_match
 import auto_apply
@@ -78,6 +82,58 @@ def run_aggregators(config: dict) -> dict:
     if sources.get("company_career_pages", {}).get("enabled"):
         jobs = company_career.fetch(sources["company_career_pages"])
         all_results["company_career"] = jobs
+
+    # LinkedIn
+    if sources.get("linkedin", {}).get("enabled"):
+        jobs = fetch_all_linkedin_jobs(sources)
+        for search_name, job_list in jobs.items():
+            all_results[f"linkedin_{search_name}"] = job_list
+
+    # Wellfound (AngelList)
+    if sources.get("wellfound", {}).get("enabled"):
+        jobs = wellfound.fetch(sources)
+        all_results["wellfound"] = jobs
+
+    # YC Job Board
+    if sources.get("yc_jobs", {}).get("enabled"):
+        jobs = yc_jobs.fetch(sources)
+        all_results["yc_jobs"] = jobs
+
+    # LinkedIn Easy Apply
+    if sources.get("linkedin_easy_apply", {}).get("enabled"):
+        print("[linkedin_easy_apply] Fetching jobs...")
+        try:
+            jobs = asyncio.run(fetch_linkedin_jobs(
+                keywords=sources["linkedin_easy_apply"].get("keywords", ["devops", "site reliability", "platform engineer", "kubernetes", "python", "golang"]),
+                location=sources["linkedin_easy_apply"].get("location", "Remote"),
+                max_pages=sources["linkedin_easy_apply"].get("max_pages", 3),
+                easy_apply_only=True,
+            ))
+            all_results["linkedin_easy_apply"] = jobs
+            print(f"  [linkedin_easy_apply] {len(jobs)} jobs")
+        except Exception as e:
+            print(f"  [linkedin_easy_apply] Error: {e}")
+
+    # Standard ATS platforms (Workable, Recruitee, Teamtailor, BreezyHR)
+    if sources.get("standard_ats", {}).get("enabled"):
+        print("[standard_ats] Fetching jobs from Workable/Recruitee/Teamtailor...")
+        jobs = asyncio.run(fetch_all_standard_ats_jobs(
+            keywords=sources["standard_ats"].get("keywords", ["devops", "kubernetes", "python", "golang", "sre"]),
+            location=sources["standard_ats"].get("location", "Remote"),
+        ))
+        all_results["standard_ats"] = jobs
+        print(f"  [standard_ats] {len(jobs)} jobs")
+
+    # Playwright-based scrapers (Wellfound, YC Jobs - more reliable)
+    if sources.get("wellfound", {}).get("enabled"):
+        print("[playwright] Fetching Wellfound jobs...")
+        jobs = playwright_scraper.fetch_wellfound_jobs(sources["wellfound"].get("max_pages", 3))
+        all_results["wellfound_pw"] = jobs
+
+    if sources.get("yc_jobs", {}).get("enabled"):
+        print("[playwright] Fetching YC Jobs...")
+        jobs = playwright_scraper.fetch_yc_jobs(sources["yc_jobs"].get("max_pages", 3))
+        all_results["yc_jobs_pw"] = jobs
 
     return all_results
 
@@ -234,148 +290,37 @@ def run_auto_apply(config: dict):
         "salary_expectation": profile.get("salary_expectation", "Negotiable"),
     }
 
-    # Get jobs to apply
+    # Get jobs to apply - prioritize supported ATS jobs
     threshold = config["filter"]["high_match_threshold"]
     max_apply = config["auto_apply"].get("max_per_day", 5)
-    jobs = get_jobs_for_apply(min_score=threshold, limit=max_apply * 3)  # Get more, filter by ATS
-
-    if not jobs:
-        print(f"No hay jobs con match >= {threshold} para aplicar")
-        return
-
-    # Filtrar solo jobs con ATS soportado
-    supported_ats = {"lever", "greenhouse", "ashby"}
-    jobs_to_apply = [j for j in jobs if auto_apply.detect_ats(j["url"]) in supported_ats]
-
-    if not jobs_to_apply:
-        print(f"No hay jobs con ATS soportado (Lever/Greenhouse/Ashby) entre los high matches")
-        print("  Jobs encontrados pero con ATS no soportado:")
-        for j in jobs:
-            ats = auto_apply.detect_ats(j["url"])
-            print(f"    {j['title']} @ {j['company']} -> {ats or 'unknown'}")
-        return
-
-    print(f"\n{'='*60}")
-    print(f"  AUTO-APPLY: {len(jobs)} jobs (score >= {threshold})")
-    print(f"{'='*60}")
-
-    applied = 0
-    for job in jobs:
-        print(f"\n  Applying to: {job['title']} @ {job['company']} ({job['url']})")
-
-        # Generate personalized cover letter for this job
-        print(f"  📝 Generando cover letter personalizada...")
-        cl_result = generate_cover_letter(job, profile)
-        if cl_result:
-            personalized_cover = cl_result.get("cover_letter", "")
-            candidate["cover_letter"] = personalized_cover
-            print(f"  ✓ Cover letter generada ({len(personalized_cover)} chars)")
-        else:
-            print(f"  ⚠ Usando cover letter base")
-
-        result = auto_apply.auto_apply_job(job, candidate, cv_path, headless=True)
-
-        if result.get("success"):
-            print(f"  ✓ Applied via {result.get('ats', 'unknown')}")
-            applied += 1
-        else:
-            print(f"  ✗ Failed: {result.get('error', 'Unknown error')}")
-
-    print(f"\n  Applied: {applied}/{len(jobs)}")
+    
+    # Usar auto-apply unificado
+    from auto_apply.unified_main import run_auto_apply_unified
+    
+    # Run unified auto-apply (async)
+    import asyncio
+    asyncio.run(run_auto_apply_unified(
+        min_score=threshold,
+        max_applications=max_apply,
+        semi_auto=False,  # Fully automatic
+        headless=True,
+    ))
     print_stats(config)
+    return
 
 
 def run_semi_apply(config: dict, job_id: Optional[int] = None):
-    """Aplicación semi-auto: llena el form automáticamente, humano resuelve CAPTCHA."""
-    from auto_apply.semi_auto import semi_apply_job, build_candidate_from_config, ensure_xvfb_running
-    from db.store import get_job
-    from generator import generate_application_package, generate_application_pdfs, load_base_cv
-
-    init_db()
-    profile = config["profile"]
-
-    # Asegurar Xvfb corriendo
-    if not ensure_xvfb_running(":99"):
-        return
-    os.environ.setdefault("DISPLAY", ":99")
-
-    def _prepare_and_apply(job: dict) -> dict:
-        """Para un job: genera PDFs + candidate + aplica semi-auto."""
-        print(f"\n  Generando PDFs para {job['company']}...")
-        package = generate_application_package(job, profile)
-        pdfs = generate_application_pdfs(job, package, profile)
-        cv_pdf = pdfs.get("cv_pdf") or "/home/Helios/job-hunter/cv.txt"
-        cl_pdf = pdfs.get("cover_letter_pdf")
-        print(f"  CV:  {cv_pdf}")
-        print(f"  CL:  {cl_pdf}")
-
-        candidate = build_candidate_from_config(config, cv_pdf, cl_pdf)
-        return semi_apply_job(job, candidate, timeout=600)
-
-    # Modo individual: un solo job
-    if job_id is not None:
-        job = get_job(job_id)
-        if not job:
-            print(f"No se encontró job con id={job_id}")
-            return
-        result = _prepare_and_apply(job)
-        print(result)
-        return
-
-    # Modo batch: recorrer todos los high-match con ATS soportado
-    from db.store import get_jobs_for_apply
-    from auto_apply.ats_detector import detect_ats, ATSType
-
-    threshold = config["filter"]["high_match_threshold"]
-    max_apply = config["auto_apply"].get("max_per_day", 5)
-    jobs = get_jobs_for_apply(min_score=threshold, limit=max_apply * 3)
-
-    if not jobs:
-        print(f"No hay jobs con match >= {threshold} para aplicar")
-        return
-
-    # Filtrar por ATS soportado
-    ats_supported = {ATSType.LEVER.value, ATSType.GREENHOUSE.value, ATSType.ASHBY.value}
-    jobs_to_apply = []
-    for j in jobs:
-        ats = detect_ats(j["url"])
-        ats_val = ats.value if ats else None
-        if ats_val in ats_supported:
-            jobs_to_apply.append(j)
-
-    if not jobs_to_apply:
-        print(f"No hay jobs con ATS soportado entre los {len(jobs)} high matches")
-        print("  (Sólo Lever/Greenhouse/Ashby soportan semi-auto)")
-        for j in jobs:
-            ats = detect_ats(j["url"])
-            print(f"    {j['title']} @ {j['company']} -> {ats.value if ats else 'unknown ATS'}")
-        return
-
-    print(f"\n{'='*60}")
-    print(f"  SEMI-AUTO APPLY: {len(jobs_to_apply)} jobs (score >= {threshold})")
-    print(f"  Presiona Ctrl+C entre jobs si quieres parar")
-    print(f"{'='*60}")
-
-    applied = 0
-    for i, job in enumerate(jobs_to_apply, 1):
-        print(f"\n--- Job {i}/{len(jobs_to_apply)} ---")
-        print(f"  {job['title']} @ {job['company']}")
-        print(f"  Score: {job.get('match_score', 'N/A')}")
-
-        result = _prepare_and_apply(job)
-        if result.get("success"):
-            applied += 1
-
-        # Pausa entre jobs
-        if i < len(jobs_to_apply):
-            print("\n  Presiona Enter para el siguiente job, o Ctrl+C para parar...")
-            try:
-                input()
-            except (KeyboardInterrupt, EOFError):
-                print("\n  Saliendo del modo batch...")
-                break
-
-    print(f"\n  Resultado: {applied}/{len(jobs_to_apply)} aplicaciones enviadas")
+    """Aplicación semi-auto unificada: llena form, humano resuelve CAPTCHA y hace submit."""
+    import asyncio
+    from auto_apply.unified_main import run_auto_apply_unified
+    
+    asyncio.run(run_auto_apply_unified(
+        min_score=config["filter"]["high_match_threshold"],
+        max_applications=config["auto_apply"].get("max_per_day", 5),
+        semi_auto=True,
+        headless=False,  # Headed para semi-auto
+        job_id=job_id,
+    ))
     print_stats(config)
 
 

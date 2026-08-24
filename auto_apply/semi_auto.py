@@ -83,7 +83,31 @@ def semi_apply_job(job: dict, candidate: CandidateProfile, timeout: int = 600) -
         }
 
     handler_class = HANDLERS[ats_name]
-    handler = handler_class(profile=candidate, headless=False, semi_auto=True)
+
+    from playwright.sync_api import sync_playwright
+    pw = sync_playwright().start()
+    browser = pw.chromium.launch(headless=False)
+    context = browser.new_context(
+        user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        viewport={"width": 1280, "height": 720},
+    )
+    page = context.new_page()
+
+    handler = handler_class(page, job, {
+        "first_name": candidate.full_name.split()[0] if candidate.full_name else "",
+        "last_name": " ".join(candidate.full_name.split()[1:]) if len(candidate.full_name.split()) > 1 else "",
+        "email": candidate.email,
+        "phone": candidate.phone,
+        "linkedin": candidate.linkedin,
+        "github": candidate.github,
+        "portfolio": candidate.portfolio,
+        "location": candidate.location,
+        "visa_status": candidate.visa_status,
+        "notice_period": candidate.notice_period,
+        "salary_expectation": candidate.salary_expectation,
+        "cover_letter": "",
+        "cover_letter_path": candidate.cover_letter_path,
+    }, candidate.cv_path, semi_auto=True)
 
     print(f"\n{'='*60}")
     print(f"  SEMI-AUTO APPLY")
@@ -125,7 +149,8 @@ def semi_apply_job(job: dict, candidate: CandidateProfile, timeout: int = 600) -
         }
     finally:
         try:
-            handler.close_browser()
+            browser.close()
+            pw.stop()
         except Exception:
             pass
 

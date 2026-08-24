@@ -1,0 +1,78 @@
+# Structured CV data for PDF generation (~/.job-hunter/profile.yaml)
+# The generator tailors this data per job: extracts JD keywords,
+# reorders matching skills first, and adapts the summary.
+
+full_name: "Your Name"
+email: "you@email.com"
+phone: "+00 00000000"
+location: "Your City, Country"
+linkedin: "https://linkedin.com/in/youruser"
+github: "https://github.com/youruser"
+portfolio: "https://yourportfolio.com"
+
+summary: |
+  2-4 sentence professional summary. Years of experience, main stack,
+  key differentiators. The generator prepends the target job title.
+
+skills:
+  infrastructure:
+    - Linux
+    - Terraform
+    - Ansible
+    - High Availability
+  containers:
+    - Kubernetes
+    - Docker
+    - Helm
+  cicd:
+    - GitHub Actions
+    - GitLab CI
+    - ArgoCD
+  observability:
+    - Prometheus
+    - Grafana
+  databases:
+    - PostgreSQL
+    - Redis
+  languages:
+    - Python
+    - Go
+    - TypeScript
+  # Add/remove categories freely — all are rendered
+
+experience:
+  - role: "Senior Role Title"
+    company: "Company or 'Freelance / Contract'"
+    location: "Remote / City"
+    start_date: "2020-01"
+    end_date: "Present"
+    description: |
+      One paragraph about your responsibilities and focus.
+    achievements:
+      - Achievement with measurable impact (reduced X by Y%)
+      - Built/designed/led something notable
+    technologies: "K8s, Terraform, Python"
+
+education:
+  - degree: "BSc Computer Science"
+    institution: "University Name"
+    location: "City, Country"
+    year: "2015"
+    details: "Optional details"
+
+certifications:
+  - name: "CKA"
+    issuer: "CNCF"
+    year: "2022"
+
+projects:
+  - name: "Project Name"
+    description: "What it does and why it matters."
+    tech_stack: "Tech, used, here"
+    github_url: "https://github.com/you/project"
+
+languages:
+  - language: "English"
+    proficiency: "Fluent"
+  - language: "Spanish"
+    proficiency: "Native"

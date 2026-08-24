@@ -8,250 +8,10 @@ from playwright.sync_api import sync_playwright, Browser, Page, Playwright
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from db.store import get_conn, init_db
-
-
-class BaseATS:
-    """Clase base para ATS."""
-
-    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
-        self.page = page
-        self.job = job
-        self.profile = profile
-        self.cv_path = cv_path
-        self.applied = False
-
-    def fill_personal_info(self):
-        """Llena info personal común."""
-        p = self.profile
-        page = self.page
-
-        # Nombre
-        self.safe_fill('input[name*="first"]', p.get("first_name", ""))
-        self.safe_fill('input[name*="last"]', p.get("last_name", ""))
-
-        # Email
-        self.safe_fill('input[type="email"], input[name*="email"]', p.get("email", ""))
-
-        # Teléfono
-        self.safe_fill('input[type="tel"], input[name*="phone"]', p.get("phone", ""))
-
-        # LinkedIn
-        self.safe_fill('input[name*="linkedin"]', p.get("linkedin", ""))
-
-        # GitHub
-        self.safe_fill('input[name*="github"]', p.get("github", ""))
-
-        # Portfolio/Website
-        self.safe_fill('input[name*="portfolio"], input[name*="website"]', p.get("portfolio", ""))
-
-    def upload_cv(self):
-        """Sube CV."""
-        page = self.page
-        file_inputs = page.query_selector_all('input[type="file"]')
-        for inp in file_inputs:
-            if inp.is_visible():
-                inp.set_input_files(self.cv_path)
-                return True
-        return False
-
-    def answer_common_questions(self):
-        """Responde preguntas comunes (visa, remote, notice period)."""
-        page = self.page
-
-        # Preguntas típicas con selects
-        selects = page.query_selector_all('select')
-        for sel in selects:
-            label = ""
-            # Buscar label asociado
-            parent = sel.query_selector("xpath=..")
-            if parent:
-                label = parent.inner_text().lower()
-
-            options = sel.query_selector_all("option")
-            for opt in options:
-                text = opt.inner_text().lower()
-                val = opt.get_attribute("value")
-
-                # Visa sponsorship
-                if "visa" in label or "sponsor" in label:
-                    if "no" in text or "not required" in text:
-                        sel.select_option(value=val)
-                        break
-
-                # Remote preference
-                if "remote" in label or "location" in label:
-                    if "remote" in text or "anywhere" in text:
-                        sel.select_option(value=val)
-                        break
-
-                # Notice period
-                if "notice" in label or "availability" in label:
-                    if "immediate" in text or "0" in text or "1 week" in text:
-                        sel.select_option(value=val)
-                        break
-
-    def safe_fill(self, selector: str, value: str) -> bool:
-        """Fill seguro."""
-        if not value:
-            return False
-        try:
-            el = self.page.query_selector(selector)
-            if el and el.is_visible():
-                el.fill(value)
-                return True
-        except Exception:
-            pass
-        return False
-
-    def safe_click(self, selector: str, timeout: int = 5000) -> bool:
-        """Click seguro."""
-        try:
-            el = self.page.wait_for_selector(selector, state="visible", timeout=timeout)
-            if el:
-                el.click()
-                return True
-        except Exception:
-            pass
-        return False
-
-    def wait_for_navigation(self, timeout: int = 30000):
-        """Espera navegación."""
-        self.page.wait_for_load_state("networkidle", timeout=timeout)
-
-    def apply(self) -> bool:
-        """Método principal - override en subclases."""
-        raise NotImplementedError
-
-
-class LeverATS(BaseATS):
-    """Auto-aplicación para Lever."""
-
-    def apply(self) -> bool:
-        page = self.page
-
-        # 1. Navegar a la URL del job
-        page.goto(self.job["url"], wait_until="networkidle")
-
-        # 2. Click "Apply for this job" si hay landing page
-        apply_selectors = [
-            'a:has-text("Apply")',
-            'button:has-text("Apply")',
-            'a[data-qa="apply-button"]',
-            'a[href*="/apply"]',
-        ]
-        for sel in apply_selectors:
-            if self.safe_click(sel):
-                self.wait_for_navigation()
-                break
-
-        # 3. Formulario de aplicación
-        # Lever suele tener: nombre, email, teléfono, LinkedIn, GitHub, CV, preguntas
-        self.fill_personal_info()
-
-        # CV
-        self.upload_cv()
-
-        # Preguntas adicionales
-        self.answer_common_questions()
-
-        # Cover letter si hay campo
-        cover_letter = self.profile.get("cover_letter", "")
-        if cover_letter:
-            self.safe_fill('textarea[name*="cover"], textarea[name*="letter"]', cover_letter)
-
-        # 4. Submit
-        submit_selectors = [
-            'button:has-text("Submit application")',
-            'button:has-text("Submit Application")',
-            'button[type="submit"]:has-text("Apply")',
-            'button[data-qa="submit-application"]',
-        ]
-        for sel in submit_selectors:
-            if self.safe_click(sel):
-                self.wait_for_navigation(30000)
-                # Verificar éxito
-                if page.query_selector('text="Application submitted", text="Thank you", .success, [data-qa="application-success"]'):
-                    self.applied = True
-                    return True
-        return False
-
-
-class GreenhouseATS(BaseATS):
-    """Auto-aplicación para Greenhouse."""
-
-    def apply(self) -> bool:
-        page = self.page
-        page.goto(self.job["url"], wait_until="networkidle")
-
-        # Fix form for file upload: change to POST with multipart/form-data
-        form = page.query_selector('form[action*="/jobs/"]')
-        if form:
-            page.evaluate('''form => {
-                form.method = "POST";
-                form.enctype = "multipart/form-data";
-            }''', page.query_selector('form[action*="/jobs/"]'))
-
-        # Greenhouse: detectar formulario
-        self.fill_personal_info()
-        self.upload_cv()
-        self.answer_common_questions()
-
-        # Cover letter
-        cover = self.profile.get("cover_letter", "")
-        if cover:
-            self.safe_fill('textarea[name*="cover"], textarea[id*="cover"]', cover)
-
-        # Click submit button instead of form.submit()
-        submit_selectors = [
-            'button:has-text("Submit application")',
-            'button:has-text("Submit Application")',
-            'button[type="submit"]',
-            'input[type="submit"][value*="Submit"]',
-        ]
-        for sel in submit_selectors:
-            if self.safe_click(sel):
-                self.wait_for_navigation(30000)
-                if page.query_selector('text="Thank you", text="Application received", .success-message'):
-                    self.applied = True
-                    return True
-        return False
-
-
-class AshbyATS(BaseATS):
-    """Auto-aplicación para Ashby."""
-
-    def apply(self) -> bool:
-        page = self.page
-        page.goto(self.job["url"], wait_until="networkidle")
-
-        # Ashby suele tener multi-step form
-        self.fill_personal_info()
-        self.upload_cv()
-        self.answer_common_questions()
-
-        # Navegar steps
-        for _ in range(5):  # max 5 steps
-            next_selectors = [
-                'button:has-text("Continue")',
-                'button:has-text("Next")',
-                'button[type="submit"]',
-            ]
-            clicked = False
-            for sel in next_selectors:
-                if self.safe_click(sel):
-                    self.wait_for_navigation()
-                    clicked = True
-                    break
-            if not clicked:
-                break
-
-        # Submit final
-        if self.safe_click('button:has-text("Submit"), button:has-text("Apply")'):
-            self.wait_for_navigation(30000)
-            if page.query_selector('text="Submitted", text="Thank you", .confirmation'):
-                self.applied = True
-                return True
-        return False
+from auto_apply.lever import LeverATS
+from auto_apply.greenhouse import GreenhouseATS
+from auto_apply.ashby import AshbyATS
+from auto_apply.base import ATSBase
 
 
 def detect_ats(url: str) -> Optional[str]:
@@ -259,27 +19,61 @@ def detect_ats(url: str) -> Optional[str]:
     url = url.lower()
     if "lever.co" in url or "jobs.lever.co" in url:
         return "lever"
-    if "greenhouse.io" in url or "boards.greenhouse.io" in url:
+    if "greenhouse.io" in url or "boards.greenhouse.io" in url or "job-boards.greenhouse.io" in url:
         return "greenhouse"
     if "ashbyhq.com" in url or "jobs.ashbyhq.com" in url:
         return "ashby"
+    if "workable.com" in url:
+        return "workable"
+    if "recruitee.com" in url:
+        return "recruitee"
+    if "teamtailor.com" in url:
+        return "teamtailor"
+    if "smartrecruiters.com" in url:
+        return "smartrecruiters"
+    if "icims.com" in url:
+        return "icims"
+    if "taleo.net" in url:
+        return "taleo"
+    if "workday.com" in url or "myworkdayjobs.com" in url:
+        return "workday"
+    if "jobvite.com" in url:
+        return "jobvite"
+    if "bamboohr.com" in url:
+        return "bamboohr"
+    if "comeet.com" in url:
+        return "comeet"
+    if "cisco.com" in url and "/jobs/" in url:
+        return "cisco"
     return None
 
 
-def get_ats_handler(ats: str, page: Page, job: dict, profile: dict, cv_path: str) -> BaseATS:
+def get_ats_handler(ats: str, page: Page, job: dict, profile: dict, cv_path: str, semi_auto: bool = False):
     """Factory para handlers."""
     handlers = {
         "lever": LeverATS,
         "greenhouse": GreenhouseATS,
         "ashby": AshbyATS,
+        "workable": WorkableATS,
+        "recruitee": RecruiteeATS,
+        "teamtailor": TeamtailorATS,
+        "smartrecruiters": SmartRecruitersATS,
+        "icims": ICIMSATS,
+        "taleo": TaleoATS,
+        "workday": WorkdayATS,
+        "jobvite": JobviteATS,
+        "bamboohr": BambooHRATS,
+        "comeet": ComeetATS,
+        "cisco": CiscoATS,
     }
     handler_class = handlers.get(ats)
     if not handler_class:
         raise ValueError(f"ATS no soportado: {ats}")
-    return handler_class(page, job, profile, cv_path)
+
+    return handler_class(page, job, profile, cv_path, semi_auto=semi_auto)
 
 
-def auto_apply_job(job: dict, profile: dict, cv_path: str, headless: bool = True) -> Dict:
+def auto_apply_job(job: dict, profile: dict, cv_path: str, headless: bool = True, semi_auto: bool = False) -> Dict:
     """
     Auto-aplica a un job.
     Returns: {success: bool, ats: str, message: str}
@@ -300,18 +94,27 @@ def auto_apply_job(job: dict, profile: dict, cv_path: str, headless: bool = True
         page = context.new_page()
 
         try:
-            handler = get_ats_handler(ats, page, job, profile, cv_path)
-            success = handler.apply()
+            handler = get_ats_handler(ats, page, job, profile, cv_path, semi_auto=semi_auto)
+            result = handler.apply()
 
-            # Update DB
-            conn = get_conn()
-            conn.execute(
-                "UPDATE jobs SET status='applied', applied_date=datetime('now') WHERE source=? AND external_id=?",
-                (job["source"], job["external_id"]),
-            )
-            conn.commit()
+            # Handle both bool and dict returns
+            if isinstance(result, dict):
+                success = result.get("success", False)
+                message = result.get("message", "Applied" if success else "Failed to submit")
+            else:
+                success = bool(result)
+                message = "Applied" if success else "Failed to submit"
 
-            return {"success": success, "ats": ats, "message": "Applied" if success else "Failed to submit"}
+            # Update DB on success
+            if success:
+                conn = get_conn()
+                conn.execute(
+                    "UPDATE jobs SET status='applied', applied_date=datetime('now') WHERE source=? AND external_id=?",
+                    (job["source"], job["external_id"]),
+                )
+                conn.commit()
+
+            return {"success": success, "ats": ats, "message": message}
 
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -332,8 +135,8 @@ if __name__ == "__main__":
             "last_name": "DevOps",
             "email": "oscar@example.com",
             "phone": "+506 1234 5678",
-            "linkedin": "https://linkedin.com/in/ozdevops",
-            "github": "https://github.com/ozdevops",
+            "linkedin": "https://linkedin.com/in/tuusuario",
+            "github": "https://github.com/Goliohs",
             "portfolio": "https://services.o7team.us",
             "cover_letter": "Experienced DevOps Architect...",
         }
@@ -341,3 +144,115 @@ if __name__ == "__main__":
         print(result)
     else:
         print("No hay jobs para aplicar")
+
+
+# Additional ATS handlers (minimal implementations)
+class WorkableATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Workable ATS not yet implemented"}
+
+class RecruiteeATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Recruitee ATS not yet implemented"}
+
+class TeamtailorATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Teamtailor ATS not yet implemented"}
+
+class SmartRecruitersATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "SmartRecruiters ATS not yet implemented"}
+
+class ICIMSATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "iCIMS ATS not yet implemented"}
+
+class TaleoATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Taleo ATS not yet implemented"}
+
+class WorkdayATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Workday ATS not yet implemented"}
+
+class JobviteATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Jobvite ATS not yet implemented"}
+
+class BambooHRATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "BambooHR ATS not yet implemented"}
+
+class ComeetATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Comeet ATS not yet implemented"}
+
+class CiscoATS:
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+        self.page = page
+        self.job = job
+        self.profile = profile
+        self.cv_path = cv_path
+    
+    def apply(self) -> dict:
+        return {"success": False, "message": "Cisco ATS not yet implemented"}

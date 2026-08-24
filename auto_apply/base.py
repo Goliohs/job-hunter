@@ -26,6 +26,10 @@ class CandidateProfile:
         if self.custom_fields is None:
             self.custom_fields = {}
 
+    def get(self, key: str, default=None):
+        """Permite acceso tipo diccionario para compatibilidad."""
+        return getattr(self, key, default)
+
 
 class ATSBase(ABC):
     """Clase base para auto-aplicación a diferentes ATS."""

@@ -124,12 +124,16 @@ def log_run(source: str, fetched: int, saved: int, rejected: int, errors: str = 
 
 
 def get_jobs_for_apply(min_score: int = 80, limit: int = 5) -> list[dict]:
-    """Obtiene jobs para auto-aplicar (high match, status new)."""
+    """Obtiene jobs para auto-aplicar (high match, status new).
+    Prioritiza fuentes con ATS soportado (Greenhouse, Lever, Ashby)."""
     with get_conn() as conn:
         rows = conn.execute(
             """SELECT * FROM jobs
                WHERE match_score >= ? AND status='new'
-               ORDER BY match_score DESC, created_at DESC LIMIT ?""",
+               ORDER BY 
+                   CASE WHEN source IN ('greenhouse_career', 'lever', 'ashby') THEN 0 ELSE 1 END,
+                   match_score DESC, 
+                   created_at DESC LIMIT ?""",
             (min_score, limit),
         ).fetchall()
         return [dict(r) for r in rows]
@@ -175,25 +179,3 @@ def get_job_notes(job_id: int) -> list[dict]:
             (job_id,),
         ).fetchall()
         return [dict(r) for r in rows]
-
-
-def get_job(job_id: int) -> Optional[dict]:
-    """Obtiene un job por ID."""
-    with get_conn() as conn:
-        row = conn.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
-        return dict(row) if row else None
-
-
-def update_job(job_id: int, status: str, note: str = "") -> bool:
-    """Actualiza el estado de un job y opcionalmente añade una nota."""
-    with get_conn() as conn:
-        conn.execute(
-            "UPDATE jobs SET status = ? WHERE id = ?",
-            (status, job_id),
-        )
-        if note:
-            conn.execute(
-                "INSERT INTO job_notes (job_id, note, note_type) VALUES (?, ?, 'general')",
-                (job_id, note),
-            )
-        return True

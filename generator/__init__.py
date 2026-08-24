@@ -12,6 +12,8 @@ try:
     WEASYPRINT_AVAILABLE = True
 except ImportError:
     WEASYPRINT_AVAILABLE = False
+    HTML = None
+    CSS = None
     print("[generator] WARNING: WeasyPrint not available, PDF generation disabled")
 
 
@@ -361,8 +363,8 @@ body { font-family: 'DejaVu Sans', 'Liberation Sans', sans-serif; font-size: 10p
 .skill { background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-size: 9pt; }
 """
 
-COVER_LETTER_CSS = CSS(string=COVER_LETTER_CSS_STR)
-CV_CSS = CSS(string=CV_CSS_STR)
+COVER_LETTER_CSS = CSS(string=COVER_LETTER_CSS_STR) if WEASYPRINT_AVAILABLE else None
+CV_CSS = CSS(string=CV_CSS_STR) if WEASYPRINT_AVAILABLE else None
 
 
 def generate_cover_letter_pdf(job: Dict, package: Dict, profile: Dict, output_path: str) -> bool:

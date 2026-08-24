@@ -25,3 +25,14 @@ chroma-data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets - NUNCA subir
+auto_apply/credentials.py
+candidate_overrides.json
+browser_profile/
+screenshots/
+generated_cvs/
+applications/
+jobs/
+config.yaml
+cv.md

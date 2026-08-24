@@ -409,8 +409,8 @@ if __name__ == "__main__":
             "last_name": "DevOps",
             "email": "oscar@example.com",
             "phone": "+506 1234 5678",
-            "linkedin": "https://linkedin.com/in/ozdevops",
-            "github": "https://github.com/ozdevops",
+            "linkedin": "https://linkedin.com/in/tuusuario",
+            "github": "https://github.com/Goliohs",
             "portfolio": "https://services.o7team.us",
             "cover_letter": "Experienced DevOps Architect...",
         }

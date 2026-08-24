@@ -93,7 +93,24 @@ def fetch(config: dict) -> list[dict]:
         ):
             continue
 
-        url = f"{base_url}/item?id={kid_id}"
+        # Extract actual job links from comment (Greenhouse, Lever, Ashby, company careers)
+        job_links = []
+        for link in soup.find_all("a", href=True):
+            href = link["href"]
+            if any(ats in href for ats in ["greenhouse.io", "lever.co", "ashbyhq.com", "careers.", "jobs.", "workable.com", "recruitee.com", "teamtailor.com", "smartrecruiters.com"]):
+                job_links.append(href)
+        
+        # Also look for bare URLs in text
+        import re
+        urls_in_text = re.findall(r'https?://[^\s\)]+', clean_text)
+        for u in urls_in_text:
+            if any(ats in u for ats in ["greenhouse.io", "lever.co", "ashbyhq.com", "careers.", "jobs.", "workable.com", "recruitee.com", "teamtailor.com", "smartrecruiters.com"]):
+                job_links.append(u)
+
+        # Use the first ATS link found, or fall back to HN comment URL
+        apply_url = job_links[0] if job_links else f"{base_url}/item?id={kid_id}"
+        
+        url = apply_url
         jobs.append(
             {
                 "source": "hackernews",
