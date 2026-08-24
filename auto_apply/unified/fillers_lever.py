@@ -556,32 +556,32 @@ class LeverFiller(ATSBaseFiller):
                 logger.warning(f"Lever question error: {type(e).__name__}: {e}")
 
     async def _select_native_option(self, sel_el, answer: str, label: str) -> bool:
-        """Selecciona opción de <select> nativo cuyo texto matchee."""
+        """Selecciona opción de <select> nativo cuyo texto matchee.
+        SIN fallback: si no hay match real, no seleccionar nada (mejor
+        que poner un dato falso). El humano decide en semi-auto."""
         try:
             options = await sel_el.query_selector_all("option")
-            ans_low = answer.lower()
+            ans_low = self._norm(answer)
             best = None
             for opt in options:
-                text = ((await opt.inner_text()) or "").strip().lower()
+                text = self._norm((await opt.inner_text()) or "")
                 value = await opt.get_attribute("value")
                 if not value:
                     continue
                 if text == ans_low or value.lower() == ans_low:
                     best = value
                     break
-                if ans_low in text or text in ans_low:
+                # Match parcial bidireccional significativo
+                if len(ans_low) > 3 and (ans_low in text or text in ans_low):
                     best = best or value
-            if best is None and options and len(options) > 1:
-                # Fallback: primera opción con valor no vacío (evita placeholder)
-                for opt in options:
-                    v = await opt.get_attribute("value")
-                    t = ((await opt.inner_text()) or "").lower()
-                    if v and ("select" not in t and "choose" not in t):
-                        best = v
-                        break
             if best is not None:
                 await sel_el.select_option(value=best)
                 return True
+            # Sin match: dejar el select como está y reportar
+            logger.warning(
+                f"Lever: select '{label[:50]}' sin opción para '{answer}' - requiere decisión humana"
+            )
+            self.broken.append(f"select-no-match: {label[:60]} (answer: {answer})")
         except Exception as e:
             logger.debug(f"Lever select error ({label}): {e}")
         return False
