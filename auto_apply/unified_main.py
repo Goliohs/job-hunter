@@ -67,6 +67,9 @@ async def run_auto_apply_unified(
         "visa_status": profile.get("visa_status", "No visa required for remote work"),
         "notice_period": profile.get("notice_period", "Immediate"),
         "salary_expectation": profile.get("salary_expectation", "Negotiable"),
+        "question_answers": profile.get("question_answers", {}),
+        "english_level": profile.get("english_level", "Advanced"),
+        "years_experience": str(profile.get("years_experience", 5)) + "+",
         "cv_path": str(Path(__file__).parent.parent / "cv.md"),
         "cover_letter_path": profile.get("cover_letter_path", ""),
         # Credenciales (opcional - para verificación por email y Easy Apply)
