@@ -33,6 +33,9 @@ profile:
   - remote
   - worldwide
   - async
+  location: Your City, Country
+  years_experience: '5'
+  how_heard_answer: Job posting online
 sources:
   remotive:
     enabled: true
