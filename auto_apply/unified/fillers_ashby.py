@@ -313,6 +313,14 @@ class AshbyFiller(LeverFiller):
         if pre.success:
             return pre
 
+        # Re-verificación pre-submit: el re-mount del autofill puede haber
+        # limpiado campos después de que los llenamos
+        for round_num in range(2):
+            await self._answer_custom_questions()
+            await self._fill_missing_by_label(final_pass=False)
+            await self.page.wait_for_timeout(2000)
+        await self._fill_missing_by_label(final_pass=True)
+
         await self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         await self.page.wait_for_timeout(500)
 
@@ -321,16 +329,40 @@ class AshbyFiller(LeverFiller):
             'button:has-text("Submit application")',
             'button:has-text("Submit")',
         ]
-        for sel in submit_selectors:
+        for attempt in range(2):
+            clicked = False
+            for sel in submit_selectors:
+                try:
+                    btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
+                    if btn:
+                        await btn.click()
+                        clicked = True
+                        logger.info("Ashby: submit clicked")
+                        break
+                except Exception:
+                    continue
+            if not clicked:
+                return FillResult(success=False, error_message="No Ashby submit button found")
+
+            result = await self._verify_ashby_confirmation()
+            if result.success:
+                return result
+
+            # ¿El server pidió correcciones? Parsear campo faltante, rellenar, reintentar
             try:
-                btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
-                if btn:
-                    await btn.click()
-                    logger.info("Ashby: submit clicked")
-                    return await self._verify_ashby_confirmation()
+                body = (await self.page.inner_text("body", timeout=3000)).lower()
+                if "needs corrections" in body or "missing entry" in body:
+                    logger.warning("Ashby: form needs corrections - re-filling and retrying")
+                    await self._answer_custom_questions()
+                    await self._fill_missing_by_label(final_pass=True)
+                    await self.page.wait_for_timeout(2500)
+                    await self._fill_missing_by_label(final_pass=True)
+                    continue  # reintentar submit
             except Exception:
-                continue
-        return FillResult(success=False, error_message="No Ashby submit button found")
+                pass
+            break
+
+        return await self._verify_ashby_confirmation()
 
     async def _verify_ashby_confirmation(self, quick: bool = False) -> FillResult:
         """Verifica confirmación de Ashby."""
@@ -341,8 +373,11 @@ class AshbyFiller(LeverFiller):
             "thank you for applying",
             "your application has been",
             "application submitted",
+            "application was successfully submitted",
+            "successfully submitted",
             "we'll be in touch",
             "successfully applied",
+            "thank you for your interest",
         ]
         if quick:
             try:

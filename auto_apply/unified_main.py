@@ -70,6 +70,8 @@ async def run_auto_apply_unified(
         "question_answers": profile.get("question_answers", {}),
         "english_level": profile.get("english_level", "Advanced"),
         "years_experience": str(profile.get("years_experience", 5)) + "+",
+        "cover_letter": profile.get("cover_letter", ""),
+        "why_answer": profile.get("why_answer", ""),
         "cv_path": str(Path(__file__).parent.parent / "cv.md"),
         "cover_letter_path": profile.get("cover_letter_path", ""),
         # Credenciales (opcional - para verificación por email y Easy Apply)

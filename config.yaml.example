@@ -34,8 +34,11 @@ profile:
   - worldwide
   - async
   location: Your City, Country
-  years_experience: '5'
+  years_experience: 5
   how_heard_answer: Job posting online
+  question_answers:
+    keyword in question: Exact answer text
+  english_level: Advanced
 sources:
   remotive:
     enabled: true
