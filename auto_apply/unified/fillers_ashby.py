@@ -1,230 +1,376 @@
 """
 Filler específico para Ashby ATS.
 
-Ashby usa multi-step wizard con data-testid attributes.
+Ashby (jobs.ashbyhq.com/{org}/{id}):
+- SPA React; el form vive en .../application
+- Campos de sistema: input[name="_systemfield_name"], _systemfield_email
+- Custom questions: inputs/textarea con name=UUID + <label> asociado
+- Resume: input[type=file] con card "Upload file"
+- Submit directo: button "Submit Application" (algunos boards multi-step)
+- Confirmación: "Application received" / página de gracias
+- Sin captcha en la gran mayoría de boards → full-auto friendly
+
+Hereda helpers probados de LeverFiller (radio smart picker, label
+resolver, question_answers, JS fallback para overlays).
 """
 import logging
-from typing import Any
+import re
+from typing import Optional
 from playwright.async_api import Page
-from .fillers import ATSBaseFiller, FillResult, register_filler
+from .fillers import FillResult, register_filler
+from .fillers_lever import LeverFiller
 
 logger = logging.getLogger(__name__)
 
 
 @register_filler("ashby")
-class AshbyFiller(ATSBaseFiller):
-    """Filler especializado para Ashby."""
-    
+class AshbyFiller(LeverFiller):
+    """Filler especializado para Ashby (reutiliza lógica de Lever)."""
+
     async def analyze(self) -> dict:
         """Analiza estructura Ashby."""
         try:
-            await self.page.wait_for_selector('[data-testid="application-form"], form', timeout=15000)
+            await self.page.wait_for_selector(
+                'input[name^="_systemfield"], form input, form textarea', timeout=15000
+            )
         except Exception:
             pass
-        
-        steps = await self.page.query_selector_all('[data-testid="step"], .step-indicator')
-        return {"steps_found": len(steps), "ats": "ashby"}
-    
+        fields = await self.page.evaluate(
+            """() => [...document.querySelectorAll('input:not([type=hidden]), textarea, select')].map(el => ({
+                tag: el.tagName.toLowerCase(), type: el.type || '', name: el.name || ''
+            }))"""
+        )
+        return {"fields": fields, "ats": "ashby"}
+
     async def navigate(self) -> bool:
-        """Navega y clickea Apply."""
+        """Click 'Apply' si estamos en la landing del posting."""
         if "ashbyhq.com" not in self.page.url:
             return False
-        
-        apply_selectors = [
-            'button:has-text("Apply")',
-            'a:has-text("Apply")',
-        ]
-        for sel in apply_selectors:
+        # Form ya visible?
+        try:
+            el = await self.page.wait_for_selector(
+                'input[name^="_systemfield"], form textarea', state="visible", timeout=2500
+            )
+            if el:
+                return True
+        except Exception:
+            pass
+        for sel in ['a:has-text("Apply for this Job")', 'button:has-text("Apply")', 'a:has-text("Apply")']:
             try:
-                btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
+                btn = await self.page.wait_for_selector(sel, state="visible", timeout=2500)
                 if btn:
                     await btn.click()
-                    await self.page.wait_for_load_state("networkidle")
+                    await self.page.wait_for_timeout(3000)
                     return True
             except Exception:
                 continue
         return True
-    
-    async def authenticate(self) -> bool:
-        """Ashby puede requerir login."""
-        # Verificar si hay login
-        login_btn = await self.page.query_selector('button:has-text("Sign in"), a:has-text("Sign in")')
-        if login_btn:
-            # En semi-auto, esperar a que el humano haga login
-            return False
-        return True
-    
+
     async def fill(self) -> FillResult:
-        """Llena formulario Ashby multi-step."""
+        """Llena el form de Ashby."""
         self.filled = {}
         self.errors = []
         self.broken = []
-        
-        max_steps = 5
-        for step in range(max_steps):
-            # Llenar página actual
-            await self._fill_current_step()
-            
-            # Click Continue/Submit
-            if step == max_steps - 1:
-                # Último paso - Submit
-                submitted = await self._click_submit()
-                if submitted:
-                    break
-            else:
-                # Click Continue
-                continued = await self._click_continue()
-                if not continued:
-                    self.errors.append(f"Step {step+1}: No continue button found")
-                    break
-                
-                await self.page.wait_for_load_state("networkidle")
-        
+
+        try:
+            await self.page.wait_for_selector(
+                'input[name^="_systemfield"], form input, form textarea',
+                state="visible", timeout=10000,
+            )
+        except Exception:
+            self.broken.append("form-not-visible")
+        await self._dismiss_cookie_banner()
+
+        # 1. CV PRIMERO: el "Autofill from resume" de Ashby re-procesa los
+        #    campos al subir el CV y puede limpiar lo ya llenado.
+        cv_path = self.candidate_data.get("cv_path", "")
+        if cv_path:
+            await self._upload_cv_ashby(cv_path)
+            # Esperar a que el autofill de Ashby termine de procesar
+            try:
+                await self.page.wait_for_selector(
+                    'text=Autofill completed', timeout=15000
+                )
+                await self.page.wait_for_timeout(1000)
+            except Exception:
+                await self.page.wait_for_timeout(3000)
+
+        # 2. Campos de sistema de Ashby (después del autofill, ganan los nuestros)
+        full_name = (
+            f"{self.candidate_data.get('first_name', '')} "
+            f"{self.candidate_data.get('last_name', '')}"
+        ).strip()
+        system_fields = [
+            ('input[name="_systemfield_name"]', full_name, "full_name"),
+            ('input[name="_systemfield_email"]', self.candidate_data.get("email", ""), "email"),
+            ('input[name="_systemfield_phone"]', self.candidate_data.get("phone", ""), "phone"),
+            ('input[name="_systemfield_linkedin"]', self.candidate_data.get("linkedin", ""), "linkedin"),
+            ('input[name="_systemfield_github"]', self.candidate_data.get("github", ""), "github"),
+            ('input[name="_systemfield_portfolio"]', self.candidate_data.get("portfolio", ""), "portfolio"),
+            ('input[name="_systemfield_location"]', self.candidate_data.get("location", ""), "location"),
+        ]
+        for sel, value, key in system_fields:
+            if value and value.strip():
+                # El autofill de Ashby re-monta los inputs cuando llega la
+                # respuesta del parseo: puede haber inputs duplicados
+                # (viejo detached + nuevo visible). Llenar SIEMPRE el visible.
+                for attempt in range(4):
+                    filled_now = await self._fill_visible_input(sel, value)
+                    await self.page.wait_for_timeout(2000)
+                    current = await self._read_visible_input(sel)
+                    if current == value.strip():
+                        self.filled[key] = value
+                        break
+                    if not filled_now and not current and attempt >= 1:
+                        break  # campo no existe en este form
+
+        # 3. Custom questions (labels UUID + radios + selects) - helpers de Lever
+        await self._answer_custom_questions()
+
+        # 4. Pass2: required visibles vacíos → resolver por label
+        await self._fill_missing_by_label(final_pass=True)
+
+        # 5. Multi-step: algunos boards Ashby tienen Continue
+        for _ in range(5):
+            next_btn = await self._find_continue_button()
+            if not next_btn:
+                break
+            logger.info("Ashby: avanzando página del form")
+            await next_btn.click()
+            await self.page.wait_for_timeout(2500)
+            await self._answer_custom_questions()
+            await self._fill_missing_by_label(final_pass=True)
+
         return FillResult(
             success=len(self.errors) == 0,
             filled_fields=self.filled,
             validation_errors=self.errors,
             broken_fields=self.broken,
         )
-    
-    async def _fill_current_step(self):
-        """Llena campos de la página actual."""
-        # Nombre completo
-        full_name = f"{self.candidate_data.get('first_name', '')} {self.candidate_data.get('last_name', '')}".strip()
-        name_fields = [
-            ('input[name="name"]', full_name),
-            ('input[name="firstName"]', self.candidate_data.get("first_name", "")),
-            ('input[name="lastName"]', self.candidate_data.get("last_name", "")),
-        ]
-        for selector, value in name_fields:
-            if value:
-                await self._fill_text(selector, value)
-        
-        # Email, teléfono
-        await self._fill_text('input[name="email"]', self.candidate_data.get("email", ""))
-        await self._fill_text('input[name="phone"]', self.candidate_data.get("phone", ""))
-        
-        # LinkedIn, GitHub, Portfolio
-        await self._fill_text('input[name="linkedin"]', self.candidate_data.get("linkedin", ""))
-        await self._fill_text('input[name="github"]', self.candidate_data.get("github", ""))
-        await self._fill_text('input[name="portfolio"]', self.candidate_data.get("portfolio", ""))
-        await self._fill_text('input[name="location"]', self.candidate_data.get("location", "Remote Worldwide"))
-        
-        # Preguntas custom (visa, notice, salary)
-        await self._answer_custom_questions()
-        
-        # Subir CV
-        cv_path = self.candidate_data.get("cv_path", "")
-        if cv_path:
-            await self._upload_cv()
-    
-    async def _answer_custom_questions(self):
-        """Responde preguntas custom Ashby."""
+
+    async def _fill_visible_input(self, selector: str, value: str) -> bool:
+        """Llena el input VISIBLE que matchee el selector (evita detached
+        duplicados tras re-render del autofill)."""
         try:
-            questions = await self.page.query_selector_all('[data-testid="question"], .custom-question')
-            for q in questions:
-                label_el = q.query_selector('label, [data-testid="question-label"]')
-                label_text = (await label_el.inner_text()).lower() if label_el else ""
-                
-                if "visa" in label_text or "authorization" in label_text:
-                    await self._fill_text('textarea, input[type="text"]', self.candidate_data.get("visa_status", "No visa required"))
-                elif "notice" in label_text or "availability" in label_text:
-                    await self._fill_text('textarea, input[type="text"]', self.candidate_data.get("notice_period", "Immediate"))
-                elif "salary" in label_text or "compensation" in label_text:
-                    await self._fill_text('input[type="text"], textarea', self.candidate_data.get("salary_expectation", "Negotiable"))
-        except Exception as e:
-            self.errors.append(f"Custom questions: {e}")
-    
-    async def _upload_cv(self):
-        """Sube CV en Ashby."""
-        cv_path = self.candidate_data.get("cv_path", "")
-        if not cv_path:
-            return
-        
+            inputs = await self.page.query_selector_all(selector)
+        except Exception:
+            return False
+        for el in inputs:
+            try:
+                if not await el.is_visible():
+                    continue
+                await el.fill(value)
+                return True
+            except Exception:
+                continue
+        return False
+
+    async def _read_visible_input(self, selector: str) -> str:
+        """Lee el valor del input visible."""
+        try:
+            inputs = await self.page.query_selector_all(selector)
+            for el in inputs:
+                if await el.is_visible():
+                    return (await el.input_value() or "").strip()
+        except Exception:
+            pass
+        return ""
+
+    async def _upload_cv_ashby(self, cv_path: str):
+        """Sube CV al input file de Ashby."""
         selectors = [
-            'input[data-testid="resume-upload"]',
-            'input[name="resume"]',
             'input[type="file"][accept*="pdf"]',
+            'form input[type="file"]',
             'input[type="file"]',
         ]
         for sel in selectors:
             try:
-                el = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
+                el = await self.page.wait_for_selector(sel, timeout=2500)
                 if el:
                     await el.set_input_files(cv_path)
-                    await self.page.wait_for_timeout(3000)
-                    self.filled["resume"] = cv_path
+                    await self.page.wait_for_timeout(2500)
+                    # Ashby muestra el nombre del archivo en la card
+                    fname = cv_path.split("/")[-1]
+                    card = await self.page.query_selector(
+                        '[class*="filename"], [class*="file-name"], [class*="uploaded"]'
+                    )
+                    shown = ((await card.inner_text()) if card else "") or fname
+                    self.filled["resume"] = shown.strip()[:60] or fname
+                    logger.info(f"Ashby: CV subido ({self.filled['resume']})")
                     return True
             except Exception:
                 continue
+        self.broken.append("cv-upload")
         return False
-    
-    async def _click_continue(self) -> bool:
-        """Click Continue/Next."""
-        selectors = [
-            'button:has-text("Continue")',
-            'button[data-testid="continue-button"]',
-            'button:has-text("Next")',
-        ]
-        for sel in selectors:
+
+    def _get_value_for_label(self, label: str) -> Optional[str]:
+        """Respuestas Ashby: reutiliza el mapeo de Lever + preguntas 'why'."""
+        label_lower = label.lower().strip()
+        cd = self.candidate_data
+
+        # Respuestas configuradas primero
+        qa = cd.get("question_answers") or {}
+        for keyword, answer in sorted(qa.items(), key=lambda kv: len(str(kv[0])), reverse=True):
+            if str(keyword).lower() in label_lower and answer:
+                return str(answer)
+
+        # Preguntas motivacionales: usar cover letter / summary del perfil
+        if "why" in label_lower and ("railway" in label_lower or "company" in label_lower
+                                     or "us" in label_lower or "role" in label_lower
+                                     or "work" in label_lower or "join" in label_lower
+                                     or "interested" in label_lower or "this position" in label_lower):
+            return cd.get("why_answer") or cd.get("cover_letter", "") or None
+        if "cover letter" in label_lower:
+            return cd.get("cover_letter", "") or None
+        if "additional" in label_lower and ("information" in label_lower or "comments" in label_lower):
+            return cd.get("additional_info") or None
+
+        # Resto del mapeo genérico de Lever
+        return super()._get_value_for_label(label)
+
+    async def _answer_custom_questions(self):
+        """Preguntas custom Ashby: label + input/textarea/radio/select."""
+        questions = await self.page.evaluate(
+            """() => {
+                const out = [];
+                document.querySelectorAll('form label, [class*="question"], [class*="field"]').forEach(l => {
+                    const t = l.textContent.trim();
+                    if (t && t.length > 3 && t.length < 300) out.push(t);
+                });
+                return [...new Set(out)];
+            }"""
+        )
+        logger.info(f"Ashby: {len(questions)} labels detectados")
+
+        # Textinputs y textareas sin name de sistema → por label del contenedor
+        inputs = await self.page.query_selector_all(
+            'form textarea, form input[type="text"]:not([name^="_systemfield"])'
+        )
+        for inp in inputs:
             try:
-                btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
-                if btn:
-                    await btn.click()
-                    return True
-            except Exception:
-                continue
-        return False
-    
-    async def _click_submit(self) -> bool:
-        """Click Submit final."""
-        selectors = [
-            'button:has-text("Submit application")',
-            'button[data-testid="submit-button"]',
-            'button:has-text("Submit")',
-        ]
-        for sel in selectors:
-            try:
-                btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
-                if btn:
-                    await btn.click()
-                    await self.page.wait_for_load_state("networkidle", timeout=30000)
-                    return True
-            except Exception:
-                continue
-        return False
-    
+                if not await inp.is_visible():
+                    continue
+                if (await inp.input_value() or "").strip():
+                    continue
+                label_text = await self._label_for_input(inp)
+                if not label_text:
+                    continue
+                answer = self._get_value_for_label(label_text)
+                if answer:
+                    await inp.fill(answer)
+                    self.filled[f"label:{label_text[:50]}"] = answer
+                    logger.info(f"Ashby: '{label_text[:40]}' llenado")
+            except Exception as e:
+                logger.warning(f"Ashby input error: {type(e).__name__}: {e}")
+
+        # Radios y selects con la maquinaria de Lever
+        try:
+            radios = await self.page.query_selector_all('form input[type="radio"]')
+            if radios:
+                # Agrupar por name
+                groups = {}
+                for r in radios:
+                    name = await r.get_attribute("name")
+                    groups.setdefault(name, []).append(r)
+                for name, group in groups.items():
+                    if any(await r.is_checked() for r in group):
+                        continue
+                    # Label del grupo: contenedor común
+                    label_text = await self._label_for_input(group[0]) or name
+                    answer = self._get_value_for_label(label_text)
+                    if answer:
+                        picked = await self._pick_radio_smart(group, answer, label_text)
+                        if picked:
+                            self.filled[f"radio:{label_text[:50]}"] = answer
+                            logger.info(f"Ashby: radio '{label_text[:40]}' -> {answer}")
+        except Exception as e:
+            logger.warning(f"Ashby radio error: {type(e).__name__}: {e}")
+
     async def validate(self) -> FillResult:
-        """Valida formulario Ashby."""
+        """Valida errores visibles y required vacíos."""
         self.errors = []
         self.broken = []
-        
-        error_selectors = [".error", ".field-error", "[data-testid='error-message']", "[role='alert']"]
-        for sel in error_selectors:
+        for sel in ["[role='alert']", ".error", "[class*='error']"]:
             try:
                 els = await self.page.query_selector_all(sel)
                 for el in els:
                     if await el.is_visible():
-                        text = (await el.inner_text()).strip()
+                        text = ((await el.inner_text()) or "").strip()
                         if text and "thank" not in text.lower():
                             self.errors.append(text[:200])
             except Exception:
                 pass
-        
         return FillResult(
-            success=len(self.errors) == 0,
+            success=len(self.errors) == 0 and len(self.broken) == 0,
             filled_fields=self.filled,
             validation_errors=self.errors,
             broken_fields=self.broken,
         )
-    
-    async def navigate(self) -> bool:
-        if "ashbyhq.com" not in self.page.url:
-            return False
-        return True
-    
-    async def authenticate(self) -> bool:
-        return True
-    
-    async def validate(self) -> FillResult:
-        return await self.validate()
+
+    async def submit_application(self) -> FillResult:
+        """Submit + verificación de confirmación Ashby."""
+        pre = await self._verify_ashby_confirmation(quick=True)
+        if pre.success:
+            return pre
+
+        await self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        await self.page.wait_for_timeout(500)
+
+        submit_selectors = [
+            'button:has-text("Submit Application")',
+            'button:has-text("Submit application")',
+            'button:has-text("Submit")',
+        ]
+        for sel in submit_selectors:
+            try:
+                btn = await self.page.wait_for_selector(sel, state="visible", timeout=3000)
+                if btn:
+                    await btn.click()
+                    logger.info("Ashby: submit clicked")
+                    return await self._verify_ashby_confirmation()
+            except Exception:
+                continue
+        return FillResult(success=False, error_message="No Ashby submit button found")
+
+    async def _verify_ashby_confirmation(self, quick: bool = False) -> FillResult:
+        """Verifica confirmación de Ashby."""
+        import asyncio
+        signals = [
+            "application received",
+            "thanks for applying",
+            "thank you for applying",
+            "your application has been",
+            "application submitted",
+            "we'll be in touch",
+            "successfully applied",
+        ]
+        if quick:
+            try:
+                body = (await self.page.inner_text("body", timeout=2000)).lower()
+                if any(s in body for s in signals):
+                    return FillResult(success=True, filled_fields=self.filled)
+            except Exception:
+                pass
+            return FillResult(success=False, error_message="not submitted yet")
+
+        deadline = asyncio.get_event_loop().time() + 20
+        while asyncio.get_event_loop().time() < deadline:
+            url = self.page.url.lower()
+            if any(p in url for p in ("/thanks", "/confirmation", "/success")):
+                await self._screenshot("ashby_confirmation")
+                return FillResult(success=True, filled_fields=self.filled)
+            try:
+                body = (await self.page.inner_text("body", timeout=3000)).lower()
+                if any(s in body for s in signals):
+                    await self._screenshot("ashby_confirmation")
+                    return FillResult(success=True, filled_fields=self.filled)
+            except Exception:
+                pass
+            await self.page.wait_for_timeout(1000)
+
+        await self._screenshot("ashby_no_confirmation")
+        return FillResult(
+            success=False,
+            error_message="No Ashby confirmation detected",
+            filled_fields=self.filled,
+        )

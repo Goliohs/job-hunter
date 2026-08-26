@@ -279,15 +279,17 @@ class LeverFiller(ATSBaseFiller):
 
     async def _label_for_input(self, inp) -> Optional[str]:
         """Resuelve el texto del label de un input (varias estrategias)."""
-        # 1. aria-label / placeholder como fallback semántico
-        for attr in ("aria-label", "placeholder"):
-            v = await inp.get_attribute(attr)
-            if v and len(v.strip()) > 2 and len(v.strip()) < 200:
-                # placeholder tipo "telephone" no sirve como pregunta; solo
-                # usar si parece pregunta (contiene espacio o termina en ?)
-                t = v.strip()
-                if attr == "placeholder" and " " not in t and not t.endswith("?"):
-                    continue
+        generic_placeholders = {"type here", "type here...", "enter", "your answer",
+                                "hello@example.com", "hello@example.com...", "optional"}
+        # 1. aria-label (placeholder solo si parece pregunta real)
+        v = await inp.get_attribute("aria-label")
+        if v and 2 < len(v.strip()) < 200:
+            return v.strip()
+        v = await inp.get_attribute("placeholder")
+        if v and v.strip().lower() not in generic_placeholders and len(v.strip()) > 2:
+            t = v.strip()
+            # Solo si parece pregunta (espacios + termina en ? o es larga)
+            if (t.endswith("?") or " " in t and len(t) > 25):
                 return t
         # 2. label[for=id]
         iid = await inp.get_attribute("id")
@@ -300,7 +302,29 @@ class LeverFiller(ATSBaseFiller):
                         return t
             except Exception:
                 pass
-        # 3. label ancestro
+        # 3. Subir por padres buscando label directo (estructura Ashby:
+        #    <div><label>Question</label><input></div>)
+        try:
+            lbl_handle = await inp.evaluate_handle(
+                """el => {
+                    let cur = el;
+                    for (let i = 0; i < 5 && cur; i++) {
+                        cur = cur.parentElement;
+                        if (!cur) break;
+                        const lbl = cur.querySelector(':scope > label, :scope > div > label');
+                        if (lbl) return lbl;
+                    }
+                    return null;
+                }"""
+            )
+            el = lbl_handle.as_element()
+            if el:
+                t = ((await el.inner_text()) or "").strip()
+                if t:
+                    return t
+        except Exception:
+            pass
+        # 4. label ancestro
         try:
             anc = await inp.evaluate_handle("el => el.closest('label')")
             el = anc.as_element()
@@ -310,7 +334,7 @@ class LeverFiller(ATSBaseFiller):
                     return t
         except Exception:
             pass
-        # 4. label dentro del contenedor de pregunta
+        # 5. label dentro del contenedor de pregunta
         try:
             anc = await inp.evaluate_handle(
                 "el => el.closest('.application-question, [data-qa*=\"question\"], div.application-facet, fieldset, form')"
