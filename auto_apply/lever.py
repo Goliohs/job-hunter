@@ -6,12 +6,13 @@ from playwright.sync_api import Page
 class LeverATS:
     """Aplicación automática para Lever."""
 
-    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str):
+    def __init__(self, page: Page, job: dict, profile: dict, cv_path: str, semi_auto: bool = False):
         self.page = page
         self.job = job
         self.profile = profile
         self.cv_path = cv_path
         self.cover_letter_path = profile.get("cover_letter_path", "")
+        self.semi_auto = semi_auto
 
     def apply(self, job_url: str = None) -> Dict[str, Any]:
         try:

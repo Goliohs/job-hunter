@@ -70,7 +70,12 @@ def get_ats_handler(ats: str, page: Page, job: dict, profile: dict, cv_path: str
     if not handler_class:
         raise ValueError(f"ATS no soportado: {ats}")
 
-    return handler_class(page, job, profile, cv_path, semi_auto=semi_auto)
+    # Solo pasar semi_auto si el handler lo acepta (stubs sin implementar no lo tienen)
+    import inspect
+    params = inspect.signature(handler_class.__init__).parameters
+    if "semi_auto" in params:
+        return handler_class(page, job, profile, cv_path, semi_auto=semi_auto)
+    return handler_class(page, job, profile, cv_path)
 
 
 def auto_apply_job(job: dict, profile: dict, cv_path: str, headless: bool = True, semi_auto: bool = False) -> Dict:

@@ -213,7 +213,7 @@ sources:
 llm:
   api_url: https://integrate.api.nvidia.com/v1/chat/completions
   api_key_env: NIM_API_KEY
-  model: meta/llama-3.1-70b-instruct
+  model: deepseek-ai/deepseek-v4-flash-0731
   temperature: 0.3
   max_tokens: 500
 filter:
