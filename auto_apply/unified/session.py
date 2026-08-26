@@ -10,6 +10,7 @@ Mantiene sesión de navegador entre aplicaciones:
 import asyncio
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import Any, Optional
 from playwright.async_api import Browser, BrowserContext, Page, async_playwright
@@ -47,7 +48,7 @@ class BrowserSessionManager:
         
         self.user_agent = user_agent or (
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
         )
         
         self._playwright = None
@@ -63,18 +64,28 @@ class BrowserSessionManager:
             
         self._playwright = await async_playwright().start()
         
-        # Argumentos anti-detección
+        # Usar Chrome real del sistema si existe (pasa detecciones anti-bot
+        # mucho mejor que el Chromium bundled de Playwright)
+        chrome_bin = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
+        launch_kwargs = {}
+        if chrome_bin:
+            launch_kwargs["executable_path"] = chrome_bin
+            logger.info(f"Using system Chrome: {chrome_bin}")
+        
+        # Argumentos: NADA que delate automatización
+        # (--disable-web-security y --disable-gpu SON red flags detectables)
         launch_args = [
             "--disable-blink-features=AutomationControlled",
-            "--disable-web-security",
             "--no-sandbox",
             "--disable-dev-shm-usage",
-            "--disable-gpu",
+            "--no-first-run",
+            "--no-default-browser-check",
         ]
         
         self._browser = await self._playwright.chromium.launch(
             headless=self.headless,
             args=launch_args,
+            **launch_kwargs,
         )
         
         # Context persistente con perfil de usuario
@@ -89,11 +100,59 @@ class BrowserSessionManager:
             accept_downloads=True,
         )
         
-        # Anti-detección
+        # Anti-detección: parches consistentes con un Chrome real
         await self._context.add_init_script("""
+            // webdriver fuera
             Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-            window.chrome = {runtime: {}};
-            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+            // chrome object con estructura real
+            window.chrome = {
+                runtime: {
+                    connect: () => {}, sendMessage: () => {},
+                    PlatformOs: {MAC: 'mac', WIN: 'win', ANDROID: 'android', CROS: 'cros', LINUX: 'linux', OPENBSD: 'openbsd'},
+                },
+                loadTimes: () => ({requestTime: Date.now() / 1000}),
+                csi: () => ({startE: Date.now(), onloadT: Date.now(), pageT: 1000}),
+            };
+            // plugins con forma real (Chrome desktop tiene 5)
+            const pluginData = [
+                {name: 'PDF Viewer', filename: 'internal-pdf-viewer', description: 'Portable Document Format'},
+                {name: 'Chrome PDF Viewer', filename: 'internal-pdf-viewer', description: 'Portable Document Format'},
+                {name: 'Chromium PDF Viewer', filename: 'internal-pdf-viewer', description: 'Portable Document Format'},
+                {name: 'Microsoft Edge PDF Viewer', filename: 'internal-pdf-viewer', description: 'Portable Document Format'},
+                {name: 'WebKit built-in PDF', filename: 'internal-pdf-viewer', description: 'Portable Document Format'},
+            ];
+            const pluginArr = pluginData.map(p => Object.assign({}, p, {length: 1}));
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => Object.assign(pluginArr, {
+                    item: i => pluginArr[i], namedItem: n => pluginArr.find(p => p.name === n),
+                    refresh: () => {}, length: pluginArr.length,
+                }),
+            });
+            Object.defineProperty(navigator, 'mimeTypes', {
+                get: () => Object.assign([{type: 'application/pdf'}], {
+                    item: i => ({type: 'application/pdf'}), length: 1,
+                }),
+            });
+            // languages coherentes con locale
+            Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
+            // WebGL: vendor/renderer de GPU real (no SwiftShader/llvmpipe)
+            const getParam = WebGLRenderingContext.prototype.getParameter;
+            WebGLRenderingContext.prototype.getParameter = function(param) {
+                if (param === 37445) return 'Google Inc. (Intel)';
+                if (param === 37446) return 'ANGLE (Intel, Intel(R) UHD Graphics (0x000046A8), OpenGL 4.6)';
+                return getParam.call(this, param);
+            };
+            const getParam2 = WebGL2RenderingContext.prototype.getParameter;
+            WebGL2RenderingContext.prototype.getParameter = function(param) {
+                if (param === 37445) return 'Google Inc. (Intel)';
+                if (param === 37446) return 'ANGLE (Intel, Intel(R) UHD Graphics (0x000046A8), OpenGL 4.6)';
+                return getParam2.call(this, param);
+            };
+            // permissions.query coherente (notifications prompt por defecto)
+            const origQuery = window.Notification && Notification.permission;
+            if (window.Notification) {
+                window.Notification.permission = 'default';
+            }
         """)
         
         self._initialized = True
