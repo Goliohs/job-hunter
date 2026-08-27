@@ -156,7 +156,7 @@ def update_job(job_id: int, status: str, note: str = "") -> bool:
         if note:
             conn.execute(
                 "INSERT INTO job_notes (job_id, note, note_type) VALUES (?, ?, 'general')",
-                (note,),
+                (job_id, note),
             )
         return True
 

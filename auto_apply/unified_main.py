@@ -149,8 +149,12 @@ async def run_auto_apply_unified(
                 update_job(job["id"], "applied", f"Applied via unified auto-apply: {state.submit_response}")
             elif state.status.value == "parked":
                 print(f"  ⏸ PARKED: {state.error_message}")
+                # Marcar como parked para que el batch pase a jobs nuevos.
+                # Disponible para reintento manual con --job-id.
+                update_job(job["id"], "parked", f"Parked (requiere humano): {state.error_message}")
             else:
                 print(f"  ❌ FAILED: {state.error_message}")
+                update_job(job["id"], "failed", f"Apply failed: {state.error_message}")
                 
         except Exception as e:
             print(f"  ❌ ERROR: {e}")
