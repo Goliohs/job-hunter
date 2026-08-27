@@ -35,11 +35,20 @@ def main():
     # Batch loop: procesa todos los unmatched en tandas de max_jobs
     processed = 0
     matched = rejected = failed = high = 0
+    failed_keys = set()
     while True:
         jobs = get_unmatched_jobs(limit=max_jobs)
         if not jobs:
             break
+        # Si todos los jobs de esta tanda ya fallaron, salir (evita loop infinito)
+        keys = {(j["source"], j["external_id"]) for j in jobs}
+        if keys and keys <= failed_keys:
+            print("[score] Solo quedan jobs que fallan LLM; saliendo.")
+            break
         for job in jobs:
+            key = (job["source"], job["external_id"])
+            if key in failed_keys:
+                continue
             result = filter_job(job, profile, CONFIG)
             if result.get("saved"):
                 update_match(
@@ -58,6 +67,7 @@ def main():
                 rejected += 1
             else:
                 failed += 1
+                failed_keys.add(key)
             processed += 1
             print(f"  [{processed}] {job['title'][:50]:<50} -> {result.get('match_score', 'ERR')}")
             time.sleep(delay)
