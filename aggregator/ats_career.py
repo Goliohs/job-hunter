@@ -181,12 +181,61 @@ def fetch_lever_career(url: str) -> List[Dict]:
 
 
 def fetch_ashby_career(url: str) -> List[Dict]:
-    """Fetch Ashby career page."""
-    print(f"[ashby_career] Fetching {url}")
-    html = fetch_page(url)
-    if not html:
+    """Fetch Ashby career page via su API pública posting-api."""
+    parsed = urlparse(url)
+    company = parsed.path.strip("/").split("/")[0]
+    if not company:
         return []
-    return []  # Simplified for now
+
+    api_url = f"https://api.ashbyhq.com/posting-api/job-board/{company}"
+    print(f"[ashby_career] Fetching {api_url}")
+    try:
+        resp = httpx.get(api_url, timeout=30, follow_redirects=True)
+        if resp.status_code != 200:
+            print(f"[ashby_career] HTTP {resp.status_code} for {api_url}")
+            return []
+        data = resp.json()
+    except Exception as e:
+        print(f"[ashby_career] Error fetching {api_url}: {e}")
+        return []
+
+    jobs = []
+    for j in data.get("jobs", []):
+        if not j.get("isListed", True):
+            continue
+
+        location = j.get("location", "") or ""
+        title = j.get("title", "")
+        workplace = (j.get("workplaceType", "") or "").lower()
+        # Evaluar remote en: isRemote + workplaceType + location + título
+        remote_text = f"{location} {title}"
+        is_remote = bool(j.get("isRemote"))
+        if not is_remote:
+            if workplace in ("remote", "fully remote", "remote-first", "hybrid"):
+                is_remote = workplace != "hybrid"
+            elif is_remote_job(remote_text):
+                is_remote = True
+
+        desc = j.get("descriptionPlain", "") or ""
+        job_url = j.get("jobUrl") or j.get("applyUrl") or ""
+        if not title or not job_url:
+            continue
+
+        jobs.append({
+            "source": "ashby_career",
+            "external_id": j.get("id") or job_url.split("/")[-1],
+            "title": title,
+            "company": company,
+            "description": desc[:4000],
+            "url": job_url,
+            "location": location or "Remote",
+            "remote": is_remote,
+            "tags": [],
+            "salary": "",
+            "posted_date": (j.get("publishedAt") or "")[:10],
+        })
+
+    return jobs
 
 
 def fetch(config: dict) -> List[Dict]:

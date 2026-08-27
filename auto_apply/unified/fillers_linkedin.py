@@ -290,22 +290,3 @@ class LinkedInFiller(ATSBaseFiller):
             validation_errors=self.errors,
             broken_fields=self.broken,
         )
-    
-    async def navigate(self) -> bool:
-        if "linkedin.com" not in self.page.url:
-            return False
-        return True
-    
-    async def authenticate(self) -> bool:
-        return True  # Handled in fill()
-    
-    async def fill(self) -> FillResult:
-        return await self.fill()
-    
-    async def validate(self) -> FillResult:
-        return FillResult(
-            success=len(self.errors) == 0,
-            filled_fields=self.filled,
-            validation_errors=self.errors,
-            broken_fields=self.broken,
-        )
