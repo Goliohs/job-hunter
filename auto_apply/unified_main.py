@@ -103,8 +103,21 @@ async def run_auto_apply_unified(
         ats = detect_ats(job["url"])
         if ats and ats in supported_ats:
             ats_jobs.append(job)
-    
-    ats_jobs = ats_jobs[:max_applications]
+
+    # Tope por empresa: Ashby/Greenhouse flaggean spam si martilleas la misma
+    # empresa varias veces seguidas. Diversificar para maximizar autos aprobados.
+    max_per_company = int(CONFIG.get("auto_apply", {}).get("max_per_company", 2))
+    company_count = {}
+    diversified = []
+    for job in ats_jobs:
+        comp = str(job.get("company", "")).lower()
+        if company_count.get(comp, 0) >= max_per_company:
+            continue
+        company_count[comp] = company_count.get(comp, 0) + 1
+        diversified.append(job)
+        if len(diversified) >= max_applications:
+            break
+    ats_jobs = diversified[:max_applications]
     
     if not ats_jobs:
         print("No hay jobs con ATS soportado para aplicar")

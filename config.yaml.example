@@ -241,6 +241,7 @@ alerts:
 auto_apply:
   enabled: false
   max_per_day: 5
+  max_per_company: 2
   ats_platforms:
   - lever
   - greenhouse
