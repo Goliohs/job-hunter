@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/Helios/job-hunter/auto_apply/unified_main.py", line 12, in <module>
-    from auto_apply.unified.orchestrator import apply_to_job, ApplicationOrchestrator
-ModuleNotFoundError: No module named 'auto_apply'
