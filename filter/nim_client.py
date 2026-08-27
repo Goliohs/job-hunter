@@ -120,7 +120,7 @@ def analyze_job_ollama(job: dict, profile: dict, config: dict) -> Optional[dict]
                     "num_predict": llm_cfg.get("max_tokens", 800),
                 },
             },
-            timeout=180,
+            timeout=300,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -142,7 +142,10 @@ def analyze_job(job: dict, profile: dict, config: dict) -> Optional[dict]:
     prompt = _build_prompt(job, profile)
     payload = {
         "model": config["llm"]["model"],
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": [
+            {"role": "system", "content": "You are a scoring engine. Output ONLY the JSON object requested by the user. Do not include reasoning, commentary, or markdown."},
+            {"role": "user", "content": prompt},
+        ],
         "temperature": config["llm"]["temperature"],
         "max_tokens": config["llm"]["max_tokens"],
         "stream": False,

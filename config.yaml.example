@@ -213,9 +213,9 @@ sources:
 llm:
   api_url: https://integrate.api.nvidia.com/v1/chat/completions
   api_key_env: NIM_API_KEY
-  model: moonshotai/kimi-k3
+  model: nvidia/nemotron-3-nano-30b-a3b
   temperature: 0.3
-  max_tokens: 800
+  max_tokens: 2000
   ollama_base_url: http://localhost:11434
   ollama_model: qwen3-tuned:latest
 filter:

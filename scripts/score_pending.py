@@ -32,45 +32,37 @@ def main():
     delay = float(CONFIG["filter"].get("rate_limit_seconds", 2.0))
     max_jobs = int(CONFIG["filter"].get("max_jobs_per_run", 5))
 
-    # Batch loop: procesa todos los unmatched en tandas de max_jobs
+    # Single pass: procesar TODOS los unmatched en orden (get_unmatched_jobs
+    # ordena por created_at DESC; snapshot completo evita que los jobs nuevos
+    # que fallan bloqueen a los más viejos).
     processed = 0
     matched = rejected = failed = high = 0
-    failed_keys = set()
-    while True:
-        jobs = get_unmatched_jobs(limit=max_jobs)
-        if not jobs:
-            break
-        # Si todos los jobs de esta tanda ya fallaron, salir (evita loop infinito)
-        keys = {(j["source"], j["external_id"]) for j in jobs}
-        if keys and keys <= failed_keys:
-            print("[score] Solo quedan jobs que fallan LLM; saliendo.")
-            break
-        for job in jobs:
-            key = (job["source"], job["external_id"])
-            if key in failed_keys:
-                continue
-            result = filter_job(job, profile, CONFIG)
-            if result.get("saved"):
-                update_match(
-                    job["source"], job["external_id"],
-                    result["match_score"], result["reason"],
-                )
-                matched += 1
-                if result["match_score"] >= CONFIG["filter"]["high_match_threshold"]:
-                    high += 1
-                    print(f"  HIGH {result['match_score']}: {job['title'][:60]} @ {job['company']}")
-            elif result.get("rejected"):
-                update_match(
-                    job["source"], job["external_id"],
-                    result.get("match_score", 0), result.get("reject_reason", ""),
-                )
-                rejected += 1
-            else:
-                failed += 1
-                failed_keys.add(key)
-            processed += 1
-            print(f"  [{processed}] {job['title'][:50]:<50} -> {result.get('match_score', 'ERR')}")
-            time.sleep(delay)
+    pending = get_unmatched_jobs(limit=100000)
+    if not pending:
+        print("[score] No hay jobs sin scorear")
+        return
+    for job in pending:
+        result = filter_job(job, profile, CONFIG)
+        if result.get("saved"):
+            update_match(
+                job["source"], job["external_id"],
+                result["match_score"], result["reason"],
+            )
+            matched += 1
+            if result["match_score"] >= CONFIG["filter"]["high_match_threshold"]:
+                high += 1
+                print(f"  HIGH {result['match_score']}: {job['title'][:60]} @ {job['company']}")
+        elif result.get("rejected"):
+            update_match(
+                job["source"], job["external_id"],
+                result.get("match_score", 0), result.get("reject_reason", ""),
+            )
+            rejected += 1
+        else:
+            failed += 1
+        processed += 1
+        print(f"  [{processed}] {job['title'][:50]:<50} -> {result.get('match_score', 'ERR')}")
+        time.sleep(delay)
 
     print(f"\nScoring completado: {processed} procesados, {matched} matched, {rejected} rejected, {failed} fallos LLM, {high} high match")
 
