@@ -1,0 +1,33 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 1 jobs
+  Semi-auto: True
+============================================================
+
+
+--- Job 1/1 ---
+  Senior Software Engineer - Reliability, Infrastructure, and Tooling @ LiveKit
+  Score: 82
+  ATS: ashby
+  URL: https://jobs.ashbyhq.com/livekit/1355f64e-b394-4982-8de6-6fd3e6e8f30d
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/LiveKit-Senior-Software-Engineer---Reliability-Infrastruct-2026-08-26/LiveKit_Senior_Software_Engineer_-_Reliability___cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/LiveKit-Senior-Software-Engineer---Reliability-Infrastruct-2026-08-26/LiveKit_Senior_Software_Engineer_-_Reliability___cv.pdf
+[02fe1b1f] HUMAN INTERVENTION REQUIRED: Review application, fill broken fields, solve CAPTCHA, then click Submit
+[02fe1b1f] Screenshot: /home/Helios/job-hunter/screenshots/02fe1b1f_human_intervention.png
+  ⏸ PARKED: Cancelled by human or timeout
+
+============================================================
+  RESULTADO: 0/1 aplicaciones exitosas
+============================================================
+
+
+============================================================
+  ESTADÍSTICAS DATABASE
+============================================================
+  Total jobs en DB:    662
+  Matched (>= 60):     162
+  High match (>= 70):  102
+  Aplicados:           30
+============================================================
+

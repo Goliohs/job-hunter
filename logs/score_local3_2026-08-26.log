@@ -1,0 +1,4 @@
+[score] Modo LOCAL: usando Ollama (sin NIM)
+[score] NIM_API_KEY no configurada — se usará Ollama local
+
+Scoring completado: 0 procesados, 0 matched, 0 rejected, 0 fallos LLM, 0 high match

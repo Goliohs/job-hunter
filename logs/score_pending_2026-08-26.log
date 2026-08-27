@@ -1,0 +1,46 @@
+  [1] Data Engineer - Latin America                      -> 55
+  [2] Java Engineer - Latin America                      -> 55
+  HIGH 75: AI-Assisted Software Engineer, Web Applications @ LMG Staffing Solutions
+  [3] AI-Assisted Software Engineer, Web Applications    -> 75
+  HIGH 82: Senior Software Engineer - Reliability, Infrastructure, and  @ LiveKit
+  [4] Senior Software Engineer - Reliability, Infrastruc -> 82
+  [5] DevOps & Site Reliability Engineer                 -> 0
+  HIGH 92: AI Product Engineer - ClickStack @ ClickHouse
+  [6] AI Product Engineer - ClickStack                   -> 92
+  HIGH 85: AI Product Engineer - ClickStack @ ClickHouse
+  [7] AI Product Engineer - ClickStack                   -> 85
+  [8] Senior Shopify Developer (Remote + Flexible)       -> 65
+  HIGH 82: Product Engineer @ SuperPlane
+  [9] Product Engineer                                   -> 82
+  HIGH 92: Senior Fullstack Engineer (f/m/d) - Berlin I Germany, EMEA I @ Hygraph
+  [10] Senior Fullstack Engineer (f/m/d) - Berlin I Germa -> 92
+  [11] Content & Creative Strategist                      -> 5
+  HIGH 82: AI-Native Software Developer @ OnTheGoSystems
+  [12] AI-Native Software Developer                       -> 82
+  [13] Senior Vue Developer                               -> 45
+  [14] Front-End WordPress Developer                      -> 0
+  [15] Backend Customer Success Engineer (Kotlin Ecosyste -> 35
+  HIGH 80: Backend Engineer, Flag Delivery @ LaunchDarkly
+  [16] Backend Engineer, Flag Delivery                    -> 80
+  [17] AI Strategy Consultant                             -> 55
+[nim] Unexpected error: 'NoneType' object has no attribute 'strip'
+  [18] Senior Staff Software Engineer, Legal Automation   -> ERR
+[nim] Unexpected error: 'NoneType' object has no attribute 'strip'
+  [19] AI Transformation Owner, CRO                       -> ERR
+[nim] Unexpected error: 'NoneType' object has no attribute 'strip'
+  [20] Senior Staff Software Engineer, Finance Automation -> ERR
+  HIGH 82: Senior Staff Software Engineer, Legal Automation @ Coinbase
+  [21] Senior Staff Software Engineer, Legal Automation   -> 82
+  HIGH 72: AI Transformation Owner, CRO @ GitLab
+  [22] AI Transformation Owner, CRO                       -> 72
+[nim] Unexpected error: 'NoneType' object has no attribute 'strip'
+  [23] Senior Staff Software Engineer, Finance Automation -> ERR
+  HIGH 75: Senior Software Engineer, Identity @ Twilio
+  [24] Senior Software Engineer, Identity                 -> 75
+[nim] JSON parse error: Unterminated string starting at: line 3 column 13 (char 35)
+[nim] Raw output: {
+  "match_score": 95,
+  "reason": "Senior AI Engineer role at GitLab is fully remote and async-friendly, aligning perfectly with the candidate's preferences. The candidate's extensive experience in AI/ML, infrastructure, and full-stack development matches
+  [25] AI Engineer                                        -> ERR
+[nim] Unexpected error: 'NoneType' object has no attribute 'strip'
+  [26] Senior Staff Software Engineer, Finance Automation -> ERR

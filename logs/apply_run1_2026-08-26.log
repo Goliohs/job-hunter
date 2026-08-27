@@ -1,0 +1,139 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 5 jobs
+  Semi-auto: False
+============================================================
+
+
+--- Job 1/5 ---
+  Senior Solutions ArchitectRemote - US @ airtable
+  Score: 95
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/airtable/jobs/8498915002
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/airtable-Senior-Solutions-ArchitectRemote---US-2026-08-26/airtable_Senior_Solutions_ArchitectRemote_-_US_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/airtable-Senior-Solutions-ArchitectRemote---US-2026-08-26/airtable_Senior_Solutions_ArchitectRemote_-_US_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_36060276002 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/airtable-Senior-Solutions-ArchitectRemote---US-2026-08-26/airtable_Senior_Solutions_ArchitectRemote_-_US_cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+  Pausa 5s antes del siguiente...
+
+--- Job 2/5 ---
+  Open Application @ tinybird
+  Score: 95
+  ATS: lever
+  URL: https://jobs.lever.co/tinybird/22cbcc27-89c4-4f87-87bc-6937712e7b10
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/tinybird-Open-Application-2026-08-26/tinybird_Open_Application_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/tinybird-Open-Application-2026-08-26/tinybird_Open_Application_cv.pdf
+Lever: select 'Which location are you applying for?' sin opción para 'Bogota' - requiere decisión humana
+Lever: select 'Which location are you applying for?' sin opción para 'Bogota' - requiere decisión humana
+[c9e7f710] SUBMIT failed: No Lever submit button found
+  ❌ FAILED: No Lever submit button found
+
+  Pausa 5s antes del siguiente...
+
+--- Job 3/5 ---
+  Senior Backend Engineer - ClickStackGermany (remote) @ clickhouse
+  Score: 95
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5838219004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Senior-Backend-Engineer---ClickStackGermany-remote-2026-08-26/clickhouse_Senior_Backend_Engineer_-_ClickStackGerm_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Backend-Engineer---ClickStackGermany-remote-2026-08-26/clickhouse_Senior_Backend_Engineer_-_ClickStackGerm_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_15707526004 (LinkedIn Profile or GitHub*...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Filling question_15707527004 (What is your current location?*...) = Costa Rica...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Backend-Engineer---ClickStackGermany-remote-2026-08-26/clickhouse_Senior_Backend_Engineer_-_ClickStackGerm_cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+  Pausa 5s antes del siguiente...
+
+--- Job 4/5 ---
+  Senior Cloud EngineerUnited States (remote) @ clickhouse
+  Score: 95
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5994726004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerUnited-States-remote-2026-08-26/clickhouse_Senior_Cloud_EngineerUnited_States__remo_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerUnited-States-remote-2026-08-26/clickhouse_Senior_Cloud_EngineerUnited_States__remo_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_17808373004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerUnited-States-remote-2026-08-26/clickhouse_Senior_Cloud_EngineerUnited_States__remo_cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+  Pausa 5s antes del siguiente...
+
+--- Job 5/5 ---
+  Senior Cloud EngineerNew(Remote) @ clickhouse
+  Score: 95
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5994727004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerNewRemote-2026-08-26/clickhouse_Senior_Cloud_EngineerNew_Remote__cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerNewRemote-2026-08-26/clickhouse_Senior_Cloud_EngineerNew_Remote__cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_17808377004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Senior-Cloud-EngineerNewRemote-2026-08-26/clickhouse_Senior_Cloud_EngineerNew_Remote__cv.pdf
+[greenhouse] Clicking submit: button:has-text("Submit application")
+[greenhouse] Verification screen: True
+[greenhouse] Waiting for NEW verification code via Zoho IMAP (since 01:24:55)...
+[greenhouse] NEW code received: FVhsBJyG - filling...
+[greenhouse] OTP pattern detected: 8 single-char inputs
+[greenhouse] OTP boxes now: 'FVhsBJyG'
+[greenhouse] ✓ OTP code filled correctly: FVhsBJyG
+[greenhouse] Clicked confirm: button:has-text("Submit")
+[greenhouse] Post-confirm URL: https://job-boards.greenhouse.io/clickhouse/jobs/5994727004/confirmation
+[greenhouse] Screenshot: /tmp/after_confirm.png
+  ✅ SUCCESS: Submitted
+  ❌ ERROR: Incorrect number of bindings supplied. The current statement uses 2, and there are 1 supplied.
+
+============================================================
+  RESULTADO: 1/5 aplicaciones exitosas
+============================================================
+
+
+============================================================
+  ESTADÍSTICAS DATABASE
+============================================================
+  Total jobs en DB:    328
+  Matched (>= 60):     150
+  High match (>= 70):  93
+  Aplicados:           21
+============================================================
+

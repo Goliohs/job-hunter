@@ -432,8 +432,13 @@ class LeverFiller(ATSBaseFiller):
             if str(keyword).lower() in label_lower and answer:
                 return str(answer)
 
+        # Confirmaciones sí/no ("Check Yes or No to indicate..."): responder Yes
+        if ("yes or no" in label_lower or "check yes or no" in label_lower
+                or "indicate if" in label_lower) and len(label_lower) < 120:
+            return "Yes"
+
         # Orden importante: patrones específicos ANTES que genéricos
-        if "sponsor" in label_lower or ("visa" in label_lower and "sponsorship" in label_lower):
+        if "sponsor" in label_lower or "sponorship" in label_lower or "sponsorship" in label_lower or "sponor" in label_lower or ("visa" in label_lower and "sponsor" in label_lower):
             return cd.get("requires_sponsorship_answer", "No")
         if "authorized" in label_lower or "authorised" in label_lower or "work authorization" in label_lower or "eligible" in label_lower:
             return "Yes"

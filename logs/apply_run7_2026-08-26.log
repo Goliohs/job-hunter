@@ -1,0 +1,162 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 5 jobs
+  Semi-auto: False
+============================================================
+
+
+--- Job 1/5 ---
+  Cloud Software Engineer - Observability PlatformNewUnited States (remote) @ clickhouse
+  Score: 75
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/6130197004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Cloud-Software-Engineer---Observability-PlatformNe-2026-08-26/clickhouse_Cloud_Software_Engineer_-_Observability__cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Cloud-Software-Engineer---Observability-PlatformNe-2026-08-26/clickhouse_Cloud_Software_Engineer_-_Observability__cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_19332193004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Filling question_19332194004 (GitHub or Website...) = https://github.com/Goliohs...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Cloud-Software-Engineer---Observability-PlatformNe-2026-08-26/clickhouse_Cloud_Software_Engineer_-_Observability__cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+  Pausa 5s antes del siguiente...
+
+--- Job 2/5 ---
+  Senior Delivery ConsultantNew York, NY; Remote - US @ airtable
+  Score: 75
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/airtable/jobs/8582568002
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/airtable-Senior-Delivery-ConsultantNew-York-NY-Remote---US-2026-08-26/airtable_Senior_Delivery_ConsultantNew_York__NY___cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/airtable-Senior-Delivery-ConsultantNew-York-NY-Remote---US-2026-08-26/airtable_Senior_Delivery_ConsultantNew_York__NY___cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_36851014002 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/airtable-Senior-Delivery-ConsultantNew-York-NY-Remote---US-2026-08-26/airtable_Senior_Delivery_ConsultantNew_York__NY___cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+  Pausa 5s antes del siguiente...
+
+--- Job 3/5 ---
+  Database Reliability Engineer - Core TeamGermany (remote) @ clickhouse
+  Score: 70
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5843422004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamGermany-r-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamGermany-r-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_15756200004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Filling question_15756201004 (Website or Github...) = https://github.com/Goliohs...
+[greenhouse] Filling question_15756202004 (What is your current location?*...) = Costa Rica...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamGermany-r-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+[greenhouse] Clicking submit: button:has-text("Submit application")
+[greenhouse] Verification screen: True
+[greenhouse] Waiting for NEW verification code via Zoho IMAP (since 02:16:36)...
+[greenhouse] NEW code received: I940UbuW - filling...
+[greenhouse] OTP pattern detected: 8 single-char inputs
+[greenhouse] OTP boxes now: 'I940UbuW'
+[greenhouse] ✓ OTP code filled correctly: I940UbuW
+[greenhouse] Clicked confirm: button:has-text("Submit")
+[greenhouse] Post-confirm URL: https://job-boards.greenhouse.io/clickhouse/jobs/5843422004/confirmation
+[greenhouse] Screenshot: /tmp/after_confirm.png
+  ✅ SUCCESS: Submitted
+
+  Pausa 5s antes del siguiente...
+
+--- Job 4/5 ---
+  Database Reliability Engineer - Core TeamUnited Kingdom (remote) @ clickhouse
+  Score: 70
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5843423004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamUnited-Ki-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamUnited-Ki-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_15756206004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Filling question_15756207004 (Website or Github...) = https://github.com/Goliohs...
+[greenhouse] Filling question_15756208004 (What is your current location?*...) = Costa Rica...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Database-Reliability-Engineer---Core-TeamUnited-Ki-2026-08-26/clickhouse_Database_Reliability_Engineer_-_Core_Tea_cv.pdf
+[greenhouse] Clicking submit: button:has-text("Submit application")
+[greenhouse] Verification screen: True
+[greenhouse] Waiting for NEW verification code via Zoho IMAP (since 02:19:12)...
+[greenhouse] NEW code received: pcNuNoM5 - filling...
+[greenhouse] OTP pattern detected: 8 single-char inputs
+[greenhouse] OTP boxes now: 'pcNuNoM5'
+[greenhouse] ✓ OTP code filled correctly: pcNuNoM5
+[greenhouse] Clicked confirm: button:has-text("Submit")
+[greenhouse] Post-confirm URL: https://job-boards.greenhouse.io/clickhouse/jobs/5843423004/confirmation
+[greenhouse] Screenshot: /tmp/after_confirm.png
+  ✅ SUCCESS: Submitted
+
+  Pausa 5s antes del siguiente...
+
+--- Job 5/5 ---
+  Full Stack Software Engineer - Control PlaneUnited States (remote) @ clickhouse
+  Score: 70
+  ATS: greenhouse
+  URL: https://job-boards.greenhouse.io/clickhouse/jobs/5587666004
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/clickhouse-Full-Stack-Software-Engineer---Control-PlaneUnited-2026-08-26/clickhouse_Full_Stack_Software_Engineer_-_Control_P_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/clickhouse-Full-Stack-Software-Engineer---Control-PlaneUnited-2026-08-26/clickhouse_Full_Stack_Software_Engineer_-_Control_P_cv.pdf
+[greenhouse] Filling basic fields: ['first_name', 'last_name', 'email', 'phone']
+[greenhouse] Filling first_name = Oscar...
+[greenhouse] ✓ Filled first_name
+[greenhouse] Filling last_name = Alfaro Porras...
+[greenhouse] ✓ Filled last_name
+[greenhouse] Filling email = goliohs@o7outlet.com...
+[greenhouse] ✓ Filled email
+[greenhouse] Filling phone = 87833158...
+[greenhouse] ✓ Filled phone
+[greenhouse] Filling phone country code combobox (+506 Costa Rica)
+[greenhouse] Filling question_13652971004 (LinkedIn Profile...) = https://linkedin.com/in/ozdevops...
+[greenhouse] Filling question_13652972004 (GitHub*...) = https://github.com/Goliohs...
+[greenhouse] Uploading CV from: /home/Helios/.job-hunter/jobs/clickhouse-Full-Stack-Software-Engineer---Control-PlaneUnited-2026-08-26/clickhouse_Full_Stack_Software_Engineer_-_Control_P_cv.pdf
+  ⏸ PARKED: Auto mode: errors or broken fields require human review
+
+============================================================
+  RESULTADO: 2/5 aplicaciones exitosas
+============================================================
+
+
+============================================================
+  ESTADÍSTICAS DATABASE
+============================================================
+  Total jobs en DB:    328
+  Matched (>= 60):     150
+  High match (>= 70):  93
+  Aplicados:           30
+============================================================
+

@@ -74,7 +74,7 @@ class AshbyFiller(LeverFiller):
 
         try:
             await self.page.wait_for_selector(
-                'input[name^="_systemfield"], form input, form textarea',
+                'input[name^="_systemfield"], input, textarea, select',
                 state="visible", timeout=10000,
             )
         except Exception:
@@ -243,8 +243,9 @@ class AshbyFiller(LeverFiller):
         logger.info(f"Ashby: {len(questions)} labels detectados")
 
         # Textinputs y textareas sin name de sistema → por label del contenedor
+        # NOTA: Ashby NO usa <form> (React SPA), así que NO restringir a form
         inputs = await self.page.query_selector_all(
-            'form textarea, form input[type="text"]:not([name^="_systemfield"])'
+            'textarea, input[type="text"]:not([name^="_systemfield"])'
         )
         for inp in inputs:
             try:
@@ -263,28 +264,93 @@ class AshbyFiller(LeverFiller):
             except Exception as e:
                 logger.warning(f"Ashby input error: {type(e).__name__}: {e}")
 
-        # Radios y selects con la maquinaria de Lever
+        # Radios y selects con la maquinaria de Lever.
+        # Ashby agrupa en <fieldset> sin <form>; el label de la pregunta va en el
+        # fieldset (texto de pregunta + opciones concatenadas).
         try:
-            radios = await self.page.query_selector_all('form input[type="radio"]')
+            radios = await self.page.query_selector_all('input[type="radio"]')
             if radios:
-                # Agrupar por name
                 groups = {}
                 for r in radios:
-                    name = await r.get_attribute("name")
+                    name = await r.get_attribute("name") or "unamed"
                     groups.setdefault(name, []).append(r)
                 for name, group in groups.items():
-                    if any(await r.is_checked() for r in group):
+                    already_checked = False
+                    for r in group:
+                        if await r.is_checked():
+                            already_checked = True
+                            break
+                    if already_checked:
                         continue
-                    # Label del grupo: contenedor común
-                    label_text = await self._label_for_input(group[0]) or name
+                    label_text = await self._ashby_radio_group_label(group[0]) or name
                     answer = self._get_value_for_label(label_text)
-                    if answer:
-                        picked = await self._pick_radio_smart(group, answer, label_text)
-                        if picked:
-                            self.filled[f"radio:{label_text[:50]}"] = answer
-                            logger.info(f"Ashby: radio '{label_text[:40]}' -> {answer}")
+                    if not answer:
+                        # EEO / opt-out: marcar "Decline / prefer not" si existe
+                        await self._pick_radio(group, ["prefer not", "decline", "do not"])
+                        continue
+                    picked = await self._pick_radio_smart(group, answer, label_text)
+                    if picked:
+                        self.filled[f"radio:{label_text[:50]}"] = answer
+                        logger.info(f"Ashby: radio '{label_text[:40]}' -> {answer}")
         except Exception as e:
             logger.warning(f"Ashby radio error: {type(e).__name__}: {e}")
+
+    async def _radio_option_text(self, r) -> str:
+        """Texto de la opción radio Ashby (sin <label>: leer div._option)."""
+        generic = await super()._radio_option_text(r)
+        if generic and generic != "on":
+            return generic
+        try:
+            txt = await r.evaluate(
+                """el => {
+                    const opt = el.closest('[class*="option"], [class*="answer"], [class*="radio"]');
+                    if (!opt) return '';
+                    let t = (opt.textContent || '').replace(/\\s+/g, ' ').trim();
+                    const inputs = opt.querySelectorAll('input, select, textarea');
+                    inputs.forEach(i => t = t.replace(i.value || '', ''));
+                    return t;
+                }"""
+            )
+            return (txt or "").strip()
+        except Exception:
+            return generic
+
+    async def _ashby_radio_group_label(self, radio) -> Optional[str]:
+        """Resuelve el texto de la pregunta de un grupo de radios Ashby.
+
+        Estructura: input[radio] → div._option → fieldset._fieldEntry
+        El fieldset contiene 'Pregunta' + todas las opciones concatenadas.
+        Restamos los textos de las opciones para quedarnos con la pregunta.
+        """
+        try:
+            info = await radio.evaluate(
+                """el => {
+                    // Subir hasta el fieldset/group contenedor
+                    let cur = el;
+                    for (let i = 0; i < 6 && cur; i++) {
+                        cur = cur.parentElement;
+                        if (!cur) break;
+                        const tag = cur.tagName;
+                        const cls = (cur.className || '').toString();
+                        if (tag === 'FIELDSET' || cls.includes('fieldEntry')) {
+                            const full = (cur.textContent || '').replace(/\\s+/g, ' ').trim();
+                            // Opciones del grupo (texto de cada radio option)
+                            const opts = [...cur.querySelectorAll('input[type="radio"]')].map(r => {
+                                const c = r.closest('label, div');
+                                return c ? (c.textContent || '').replace(/\\s+/g, ' ').trim() : (r.value || '');
+                            });
+                            let q = full;
+                            for (const o of opts) q = q.replace(o, '');
+                            return q.replace(/\\s+/g, ' ').trim() || full || null;
+                        }
+                    }
+                    return null;
+                }"""
+            )
+            return info
+        except Exception as e:
+            logger.warning(f"Ashby radio group label error: {e}")
+            return None
 
     async def validate(self) -> FillResult:
         """Valida errores visibles y required vacíos."""
@@ -379,6 +445,13 @@ class AshbyFiller(LeverFiller):
             "successfully applied",
             "thank you for your interest",
         ]
+        spam_signals = [
+            "flagged as possible spam",
+            "we couldn't submit your application",
+            "couldn't submit your application",
+            "possible spam",
+            "verify you are not a robot",
+        ]
         if quick:
             try:
                 body = (await self.page.inner_text("body", timeout=2000)).lower()
@@ -399,6 +472,12 @@ class AshbyFiller(LeverFiller):
                 if any(s in body for s in signals):
                     await self._screenshot("ashby_confirmation")
                     return FillResult(success=True, filled_fields=self.filled)
+                if any(s in body for s in spam_signals):
+                    await self._screenshot("ashby_spam_blocked")
+                    return FillResult(
+                        success=False,
+                        error_message="Ashby spam detection bloqueó el submit (flag anti-bot). Usar modo semi-auto / nueva sesión.",
+                    )
             except Exception:
                 pass
             await self.page.wait_for_timeout(1000)

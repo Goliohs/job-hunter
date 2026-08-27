@@ -1,0 +1,60 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 1 jobs
+  Semi-auto: False
+============================================================
+
+
+--- Job 1/1 ---
+  Senior Software Engineer - Reliability, Infrastructure, and Tooling @ LiveKit
+  Score: 82
+  ATS: ashby
+  URL: https://jobs.ashbyhq.com/livekit/1355f64e-b394-4982-8de6-6fd3e6e8f30d
+23:15:39 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+23:15:39 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+23:15:39 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+23:15:40 [weasyprint.progress] INFO: Step 1 - Fetching and parsing HTML - HTML string
+23:15:40 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+23:15:40 [weasyprint.progress] INFO: Step 3 - Applying CSS
+23:15:40 [weasyprint.progress] INFO: Step 4 - Creating formatting structure
+23:15:40 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 1
+23:15:40 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 2
+23:15:40 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 3
+23:15:40 [weasyprint.progress] INFO: Step 6 - Creating PDF
+23:15:40 [weasyprint.progress] INFO: Step 7 - Adding PDF metadata
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/LiveKit-Senior-Software-Engineer---Reliability-Infrastruct-2026-08-26/LiveKit_Senior_Software_Engineer_-_Reliability___cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/LiveKit-Senior-Software-Engineer---Reliability-Infrastruct-2026-08-26/LiveKit_Senior_Software_Engineer_-_Reliability___cv.pdf
+23:15:40 [auto_apply.unified.orchestrator] INFO: [907a3c58] Starting application for Senior Software Engineer - Reliability, Infrastructure, and Tooling @ LiveKit
+23:15:41 [auto_apply.unified.session] INFO: Using system Chrome: /home/Helios/.local/bin/google-chrome
+23:15:41 [auto_apply.unified.session] INFO: Browser session initialized (headless=True)
+23:15:41 [auto_apply.unified.orchestrator] INFO: [907a3c58] ANALYZE: Detecting ATS structure
+23:15:56 [auto_apply.unified.orchestrator] INFO: [907a3c58] ANALYZE complete: {'fields': [], 'ats': 'ashby'}
+23:15:56 [auto_apply.unified.orchestrator] INFO: [907a3c58] NAVIGATE: Going to https://jobs.ashbyhq.com/livekit/1355f64e-b394-4982-8de6-6fd3e6e8f30d
+23:16:04 [auto_apply.unified.orchestrator] INFO: [907a3c58] NAVIGATE complete: https://jobs.ashbyhq.com/livekit/1355f64e-b394-4982-8de6-6fd3e6e8f30d/application
+23:16:04 [auto_apply.unified.orchestrator] INFO: [907a3c58] AUTH: Checking authentication
+23:16:04 [auto_apply.unified.orchestrator] INFO: [907a3c58] No authentication required
+23:16:04 [auto_apply.unified.orchestrator] INFO: [907a3c58] FILL: Filling application form
+23:16:07 [auto_apply.unified.fillers_ashby] INFO: Ashby: CV subido (LiveKit_Senior_Software_Engineer_-_Reliability___cv.pdf)
+23:16:32 [auto_apply.unified.fillers_ashby] INFO: Ashby: 22 labels detectados
+23:16:32 [auto_apply.unified.fillers_lever] INFO: Lever: 'Tell us about you and why you're excited to apply ' llenado por label (pass2)
+23:16:32 [auto_apply.unified.fillers_lever] INFO: Lever: 'Tell us about a project you're proud of!' llenado por label (pass2)
+23:16:32 [auto_apply.unified.fillers_lever] INFO: Lever: 'Github Link or Linkedin Link' llenado por label (pass2)
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] FILL complete: 6 fields, 0 errors, 0 broken
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] VALIDATE: Validating form
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] VALIDATE complete: 0 errors, 0 broken fields
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] REVIEW: Preparing for human review (semi_auto=False)
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] Auto-approved (no errors/broken fields)
+23:16:36 [auto_apply.unified.orchestrator] INFO: [907a3c58] SUBMIT: Submitting application
+23:16:36 [auto_apply.unified.fillers_ashby] INFO: Ashby: 22 labels detectados
+23:16:38 [auto_apply.unified.fillers_ashby] INFO: Ashby: 22 labels detectados
+23:16:41 [auto_apply.unified.fillers_ashby] INFO: Ashby: submit clicked
+23:17:22 [auto_apply.unified.orchestrator] ERROR: [907a3c58] SUBMIT failed: No Ashby confirmation detected
+23:17:23 [auto_apply.unified.notifications] INFO: Notification sent: ❌ Fallo en ashby
+23:17:23 [auto_apply.unified.orchestrator] INFO: [907a3c58] Page closed externally
+  ❌ FAILED: No Ashby confirmation detected
+
+============================================================
+  RESULTADO: 0/1 aplicaciones exitosas
+============================================================
+

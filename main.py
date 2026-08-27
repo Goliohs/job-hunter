@@ -299,11 +299,14 @@ def run_auto_apply(config: dict):
     
     # Run unified auto-apply (async)
     import asyncio
+    # Headed por defecto (anti-bot): corre bajo Xvfb vía cron_runner.sh.
+    # En headless Ashby flaggea como spam.
+    headless = os.environ.get("APPLY_HEADLESS", "0") == "1"
     asyncio.run(run_auto_apply_unified(
         min_score=threshold,
         max_applications=max_apply,
         semi_auto=False,  # Fully automatic
-        headless=True,
+        headless=headless,
     ))
     print_stats(config)
     return

@@ -1,0 +1,65 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 1 jobs
+  Semi-auto: False
+============================================================
+
+
+--- Job 1/1 ---
+  Senior Software Engineer @ confluent
+  Score: 95
+  ATS: ashby
+  URL: https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219
+00:21:42 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:21:42 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:21:42 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:21:42 [weasyprint.progress] INFO: Step 1 - Fetching and parsing HTML - HTML string
+00:21:42 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:21:42 [weasyprint.progress] INFO: Step 3 - Applying CSS
+00:21:42 [weasyprint.progress] INFO: Step 4 - Creating formatting structure
+00:21:42 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 1
+00:21:43 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 2
+00:21:43 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 3
+00:21:43 [weasyprint.progress] INFO: Step 6 - Creating PDF
+00:21:43 [weasyprint.progress] INFO: Step 7 - Adding PDF metadata
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/confluent-Senior-Software-Engineer-2026-08-27/confluent_Senior_Software_Engineer_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/confluent-Senior-Software-Engineer-2026-08-27/confluent_Senior_Software_Engineer_cv.pdf
+00:21:43 [auto_apply.unified.orchestrator] INFO: [8b81416d] Starting application for Senior Software Engineer @ confluent
+00:21:43 [auto_apply.unified.session] INFO: Using system Chrome: /home/Helios/.local/bin/google-chrome
+00:21:44 [auto_apply.unified.session] INFO: Browser session initialized (headless=True)
+00:21:44 [auto_apply.unified.orchestrator] INFO: [8b81416d] ANALYZE: Detecting ATS structure
+00:21:59 [auto_apply.unified.orchestrator] INFO: [8b81416d] ANALYZE complete: {'fields': [], 'ats': 'ashby'}
+00:21:59 [auto_apply.unified.orchestrator] INFO: [8b81416d] NAVIGATE: Going to https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219
+00:22:07 [auto_apply.unified.orchestrator] INFO: [8b81416d] NAVIGATE complete: https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219/application
+00:22:07 [auto_apply.unified.orchestrator] INFO: [8b81416d] AUTH: Checking authentication
+00:22:07 [auto_apply.unified.orchestrator] INFO: [8b81416d] No authentication required
+00:22:07 [auto_apply.unified.orchestrator] INFO: [8b81416d] FILL: Filling application form
+00:22:10 [auto_apply.unified.fillers_ashby] INFO: Ashby: CV subido (confluent_Senior_Software_Engineer_cv.pdf)
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'Legal FULL Name' llenado
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'LinkedIn Profile URL' llenado
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'GitHub Profile URL' llenado
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'Portfolio URL' llenado
+00:22:35 [auto_apply.unified.fillers_ashby] INFO: Ashby: radio 'Mobile PhoneCheck Yes or No to indicate ' -> 87833158
+00:22:36 [auto_apply.unified.fillers_lever] INFO: Lever: 'Mobile Phone' llenado por label (pass2)
+00:22:36 [auto_apply.unified.fillers_lever] INFO: Lever: 'Alt. Phone' llenado por label (pass2)
+00:22:36 [auto_apply.unified.fillers_lever] INFO: Lever: 'Location' llenado por label (pass2)
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] FILL complete: 11 fields, 1 errors, 0 broken
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] VALIDATE: Validating form
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] VALIDATE complete: 0 errors, 0 broken fields
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] REVIEW: Preparing for human review (semi_auto=False)
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] Auto-approved (no errors/broken fields)
+00:22:40 [auto_apply.unified.orchestrator] INFO: [8b81416d] SUBMIT: Submitting application
+00:22:40 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:22:43 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:22:47 [auto_apply.unified.fillers_ashby] INFO: Ashby: submit clicked
+00:22:51 [auto_apply.unified.orchestrator] ERROR: [8b81416d] SUBMIT failed: Ashby spam detection bloqueó el submit (flag anti-bot). Usar modo semi-auto / nueva sesión.
+00:22:51 [auto_apply.unified.notifications] INFO: Notification sent: ❌ Fallo en ashby
+00:22:51 [auto_apply.unified.orchestrator] INFO: [8b81416d] Page closed externally
+  ❌ FAILED: Ashby spam detection bloqueó el submit (flag anti-bot). Usar modo semi-auto / nueva sesión.
+
+============================================================
+  RESULTADO: 0/1 aplicaciones exitosas
+============================================================
+

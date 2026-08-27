@@ -53,9 +53,9 @@ run_apply_xvfb() {
 
 case "$MODE" in
     scrape)     run_pipeline ;;
-    apply)      run_apply ;;
+    apply)      run_apply_xvfb ;;
     xvfb-apply) run_apply_xvfb ;;
-    all)        run_pipeline; run_apply ;;
+    all)        run_pipeline; run_apply_xvfb ;;
     *)          log "modo desconocido: $MODE"; exit 1 ;;
 esac
 

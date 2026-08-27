@@ -4,7 +4,14 @@ Punto de entrada unificado para auto-apply (integra con job-hunter existente).
 import asyncio
 import sys
 import os
+import logging
 from pathlib import Path
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 # Asegurar que job-hunter está en path
 sys.path.insert(0, str(Path(__file__).parent.parent))

@@ -1,0 +1,70 @@
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  UNIFIED AUTO-APPLY: 1 jobs
+  Semi-auto: False
+============================================================
+
+
+--- Job 1/1 ---
+  Senior Software Engineer @ confluent
+  Score: 95
+  ATS: ashby
+  URL: https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219
+00:26:36 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:26:36 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:26:36 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:26:36 [weasyprint.progress] INFO: Step 1 - Fetching and parsing HTML - HTML string
+00:26:36 [weasyprint.progress] INFO: Step 2 - Fetching and parsing CSS - CSS string
+00:26:36 [weasyprint.progress] INFO: Step 3 - Applying CSS
+00:26:36 [weasyprint.progress] INFO: Step 4 - Creating formatting structure
+00:26:36 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 1
+00:26:36 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 2
+00:26:36 [weasyprint.progress] INFO: Step 5 - Creating layout - Page 3
+00:26:36 [weasyprint.progress] INFO: Step 6 - Creating PDF
+00:26:36 [weasyprint.progress] INFO: Step 7 - Adding PDF metadata
+[cv_gen] PDF generado (weasyprint): /home/Helios/.job-hunter/jobs/confluent-Senior-Software-Engineer-2026-08-27/confluent_Senior_Software_Engineer_cv.pdf
+  📄 CV adaptado: /home/Helios/.job-hunter/jobs/confluent-Senior-Software-Engineer-2026-08-27/confluent_Senior_Software_Engineer_cv.pdf
+00:26:36 [auto_apply.unified.orchestrator] INFO: [67c712e1] Starting application for Senior Software Engineer @ confluent
+00:26:37 [auto_apply.unified.session] INFO: Using system Chrome: /home/Helios/.local/bin/google-chrome
+00:26:38 [auto_apply.unified.session] INFO: Browser session initialized (headless=False)
+00:26:38 [auto_apply.unified.orchestrator] INFO: [67c712e1] ANALYZE: Detecting ATS structure
+00:26:53 [auto_apply.unified.orchestrator] INFO: [67c712e1] ANALYZE complete: {'fields': [], 'ats': 'ashby'}
+00:26:53 [auto_apply.unified.orchestrator] INFO: [67c712e1] NAVIGATE: Going to https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219
+00:27:03 [auto_apply.unified.orchestrator] INFO: [67c712e1] NAVIGATE complete: https://jobs.ashbyhq.com/confluent/8b41454a-1025-418b-b7eb-642dd8408219/application
+00:27:03 [auto_apply.unified.orchestrator] INFO: [67c712e1] AUTH: Checking authentication
+00:27:03 [auto_apply.unified.orchestrator] INFO: [67c712e1] No authentication required
+00:27:03 [auto_apply.unified.orchestrator] INFO: [67c712e1] FILL: Filling application form
+00:27:06 [auto_apply.unified.fillers_ashby] INFO: Ashby: CV subido (confluent_Senior_Software_Engineer_cv.pdf)
+00:27:42 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:27:42 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'Legal FULL Name' llenado
+00:27:42 [auto_apply.unified.fillers_ashby] INFO: Ashby: 'Portfolio URL' llenado
+00:27:42 [auto_apply.unified.fillers_ashby] INFO: Ashby: radio 'Mobile PhoneCheck Yes or No to indicate ' -> 87833158
+00:27:43 [auto_apply.unified.fillers_lever] INFO: Lever: 'Mobile Phone' llenado por label (pass2)
+00:27:43 [auto_apply.unified.fillers_lever] INFO: Lever: 'Alt. Phone' llenado por label (pass2)
+00:27:43 [auto_apply.unified.fillers_lever] INFO: Lever: 'Location' llenado por label (pass2)
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] FILL complete: 9 fields, 1 errors, 0 broken
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] VALIDATE: Validating form
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] VALIDATE complete: 0 errors, 0 broken fields
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] REVIEW: Preparing for human review (semi_auto=False)
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] Auto-approved (no errors/broken fields)
+00:27:47 [auto_apply.unified.orchestrator] INFO: [67c712e1] SUBMIT: Submitting application
+00:27:47 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:27:50 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:27:54 [auto_apply.unified.fillers_ashby] INFO: Ashby: submit clicked
+00:28:14 [auto_apply.unified.fillers_ashby] WARNING: Ashby: form needs corrections - re-filling and retrying
+00:28:14 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:28:15 [auto_apply.unified.fillers_lever] INFO: Lever: 'Location' llenado por label (pass2)
+00:28:18 [auto_apply.unified.fillers_ashby] INFO: Ashby: submit clicked
+00:28:39 [auto_apply.unified.fillers_ashby] WARNING: Ashby: form needs corrections - re-filling and retrying
+00:28:39 [auto_apply.unified.fillers_ashby] INFO: Ashby: 23 labels detectados
+00:28:39 [auto_apply.unified.fillers_lever] INFO: Lever: 'Location' llenado por label (pass2)
+00:29:03 [auto_apply.unified.orchestrator] ERROR: [67c712e1] SUBMIT failed: No Ashby confirmation detected
+00:29:03 [auto_apply.unified.notifications] INFO: Notification sent: ❌ Fallo en ashby
+00:29:03 [auto_apply.unified.orchestrator] INFO: [67c712e1] Page closed externally
+  ❌ FAILED: No Ashby confirmation detected
+
+============================================================
+  RESULTADO: 0/1 aplicaciones exitosas
+============================================================
+

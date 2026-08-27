@@ -1,0 +1,204 @@
+[2026-08-27 00:00:00] === cron run iniciado (mode=scrape) ===
+[2026-08-27 00:00:00] --- scrape + filter ---
+[breezyhr] Error with linear: Expecting value: line 1 column 1 (char 0)
+[db] Initialized at /home/Helios/job-hunter/jobs.db
+
+============================================================
+  JOB HUNTER BOT - Iniciando pipeline
+============================================================
+
+[1/3] Scrapeando fuentes públicas...
+[remotive] Fetched 18 jobs from API
+[remoteok] Fetched 99 jobs from API
+[wwr] Fetched 25 jobs from RSS
+[hn] Thread encontrado: 22665398
+[hn] 100 comentarios en el thread
+[hn] 65 jobs remotos encontrados en HN
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/clickhouse
+  https://job-boards.greenhouse.io/clickhouse: 47 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/planetscale
+  https://job-boards.greenhouse.io/planetscale: 5 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/canonical
+  https://job-boards.greenhouse.io/canonical: 11 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/pagerduty
+  https://job-boards.greenhouse.io/pagerduty: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/gitlab
+  https://job-boards.greenhouse.io/gitlab: 1 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/vercel
+  https://job-boards.greenhouse.io/vercel: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/singlestore
+  https://job-boards.greenhouse.io/singlestore: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/cockroachdb
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/cockroachdb
+  https://job-boards.greenhouse.io/cockroachdb: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/timescale
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/timescale
+  https://job-boards.greenhouse.io/timescale: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/materialize
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/materialize
+  https://job-boards.greenhouse.io/materialize: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/tinybird
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/tinybird
+  https://job-boards.greenhouse.io/tinybird: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/cloudflare
+  https://job-boards.greenhouse.io/cloudflare: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/mongodb
+  https://job-boards.greenhouse.io/mongodb: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/datadog
+  https://job-boards.greenhouse.io/datadog: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/elastic
+  https://job-boards.greenhouse.io/elastic: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/stripe
+  https://job-boards.greenhouse.io/stripe: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/airtable
+  https://job-boards.greenhouse.io/airtable: 7 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/cockroachdb
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/cockroachdb
+  https://job-boards.greenhouse.io/cockroachdb: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/singlestore
+  https://job-boards.greenhouse.io/singlestore: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/timescale
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/timescale
+  https://job-boards.greenhouse.io/timescale: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/materialize
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/materialize
+  https://job-boards.greenhouse.io/materialize: 0 remote jobs
+[greenhouse_career] Fetching https://job-boards.greenhouse.io/tinybird
+[ats_career] HTTP 404 for https://job-boards.greenhouse.io/tinybird
+  https://job-boards.greenhouse.io/tinybird: 0 remote jobs
+[lever_career] Fetching https://jobs.lever.co/tinybird
+  https://jobs.lever.co/tinybird: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/supabase
+  https://jobs.ashbyhq.com/supabase: 57 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/clickhouse
+  https://jobs.ashbyhq.com/clickhouse: 178 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/snowflake
+  https://jobs.ashbyhq.com/snowflake: 385 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/vercel
+  https://jobs.ashbyhq.com/vercel: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/planetscale
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/planetscale
+  https://jobs.ashbyhq.com/planetscale: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/railway
+  https://jobs.ashbyhq.com/railway: 8 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/render
+  https://jobs.ashbyhq.com/render: 32 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/fly.io
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/fly.io
+  https://jobs.ashbyhq.com/fly.io: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/cloudflare
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/cloudflare
+  https://jobs.ashbyhq.com/cloudflare: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/mongodb
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/mongodb
+  https://jobs.ashbyhq.com/mongodb: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/redis
+  https://jobs.ashbyhq.com/redis: 19 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/canonical
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/canonical
+  https://jobs.ashbyhq.com/canonical: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/cockroachdb
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/cockroachdb
+  https://jobs.ashbyhq.com/cockroachdb: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/timescale
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/timescale
+  https://jobs.ashbyhq.com/timescale: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/materialize
+  https://jobs.ashbyhq.com/materialize: 4 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/tinybird
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/tinybird
+  https://jobs.ashbyhq.com/tinybird: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/grafana
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/grafana
+  https://jobs.ashbyhq.com/grafana: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/confluent
+  https://jobs.ashbyhq.com/confluent: 27 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/pagerduty
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/pagerduty
+  https://jobs.ashbyhq.com/pagerduty: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/gitlab
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/gitlab
+  https://jobs.ashbyhq.com/gitlab: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/datadog
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/datadog
+  https://jobs.ashbyhq.com/datadog: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/elastic
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/elastic
+  https://jobs.ashbyhq.com/elastic: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/hashicorp
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/hashicorp
+  https://jobs.ashbyhq.com/hashicorp: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/stripe
+[ashby_career] HTTP 404 for https://api.ashbyhq.com/posting-api/job-board/stripe
+  https://jobs.ashbyhq.com/stripe: 0 remote jobs
+[ashby_career] Fetching https://api.ashbyhq.com/posting-api/job-board/airtable
+  https://jobs.ashbyhq.com/airtable: 0 remote jobs
+  [lever] Fetching https://jobs.lever.co/tinybird
+  [lever] 2 jobs found
+[linkedin_easy_apply] Fetching jobs...
+[linkedin] Error fetching page: Server error '500 Internal Server Error' for url 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=python&location=Remote&position=1&pageNum=0&start=0&f_AL=true'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+  [linkedin_easy_apply] 0 jobs
+[standard_ats] Fetching jobs from Workable/Recruitee/Teamtailor...
+  [standard_ats] 0 jobs
+
+[2/3] Guardando jobs en DB...
+  remotive: 0 jobs encontrados
+    → 0 nuevos, 0 duplicados
+  remoteok: 5 jobs encontrados
+    → 0 nuevos, 5 duplicados
+  wwr: 25 jobs encontrados
+    → 0 nuevos, 25 duplicados
+  hackernews: 65 jobs encontrados
+    → 0 nuevos, 65 duplicados
+  greenhouse_career: 71 jobs encontrados
+    → 0 nuevos, 71 duplicados
+  ashby_career: 710 jobs encontrados
+    → 376 nuevos, 334 duplicados
+  lever: 2 jobs encontrados
+    → 0 nuevos, 2 duplicados
+  company_career: 0 jobs encontrados
+    → 0 nuevos, 0 duplicados
+  linkedin_easy_apply: 0 jobs encontrados
+    → 0 nuevos, 0 duplicados
+  standard_ats: 0 jobs encontrados
+    → 0 nuevos, 0 duplicados
+
+  Total nuevos guardados: 376
+  Total duplicados (ignorados): 502
+
+[3/3] Filtrando con NIM LLM...
+  Analizando 5 jobs sin scoring...
+[nim] HTTP 429, retry en 5s...
+[nim] HTTP 429, retry en 10s...
+[nim] HTTP error 429: {"status":429,"title":"Too Many Requests"}
+[nim] Rate limit / sobrecarga → usando Ollama local
+[nim] HTTP 429, retry en 5s...
+[nim] HTTP 429, retry en 10s...
+[nim] HTTP error 429: {"status":429,"title":"Too Many Requests"}
+[nim] Rate limit / sobrecarga → usando Ollama local
+[nim] HTTP 429, retry en 5s...
+[nim] HTTP 429, retry en 10s...
+[nim] HTTP error 429: {"status":429,"title":"Too Many Requests"}
+[nim] Rate limit / sobrecarga → usando Ollama local
+[nim] HTTP 429, retry en 5s...
+[nim] HTTP 429, retry en 10s...
+[nim] HTTP error 429: {"status":429,"title":"Too Many Requests"}
+[nim] Rate limit / sobrecarga → usando Ollama local
+
+  Resultados del filtro LLM:
+  Matched (>= 60): 0
+  High match (>= 70): 0
+  Rejected: 5
+
+============================================================
+  ESTADÍSTICAS DATABASE
+============================================================
+  Total jobs en DB:    1038
+  Matched (>= 60):     162
+  High match (>= 70):  102
+  Aplicados:           30
+============================================================
+
+[2026-08-27 00:06:13] --- pipeline terminado (rc=0) ---
+[2026-08-27 00:06:13] === cron run terminado ===
