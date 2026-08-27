@@ -1,6 +1,12 @@
-"""Cliente NVIDIA NIM para análisis de JD y scoring de match."""
+"""Cliente LLM para análisis de JD y scoring de match.
+
+Backends:
+  - NVIDIA NIM (OpenAI-compatible)  — primary
+  - Ollama local (fallback cuando NIM está rate-limited o caído)
+"""
 import os
 import json
+import re
 import httpx
 from typing import Optional
 
@@ -9,6 +15,9 @@ NIM_API_KEY = os.environ.get("NIM_API_KEY", "")
 
 # NIM acepta OpenAI-compatible chat completions
 NIM_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3-tuned:latest")
 
 
 def _build_prompt(job: dict, profile: dict) -> str:
@@ -59,12 +68,76 @@ Scoring guidelines:
 - 0-49: Poor match — onsite/hybrid/relocation required, junior/entry-level, dealbreaker triggered"""
 
 
-def analyze_job(job: dict, profile: dict, config: dict) -> Optional[dict]:
-    """Analiza un job con NIM LLM. Devuelve {match_score, reason, dealbreaker_hit} o None."""
-    api_key = os.environ.get(config["llm"]["api_key_env"], NIM_API_KEY)
-    if not api_key:
-        print("[nim] WARNING: NIM_API_KEY no configurada. ¿Está en el entorno?")
+def _parse_result_content(content: str) -> Optional[dict]:
+    """Extrae el JSON {match_score, reason, dealbreaker_hit} de la respuesta LLM."""
+    if not content:
         return None
+    content = content.strip()
+    # NIM a veces envuelve en ```json
+    if "```" in content:
+        start = content.find("{")
+        end = content.rfind("}")
+        content = content[start:end+1]
+
+    result = None
+    try:
+        result = json.loads(content)
+    except json.JSONDecodeError:
+        # Buscar el último objeto JSON válido (razonamiento + JSON final)
+        for cand in reversed(re.findall(r"\{.*?\}", content, flags=re.DOTALL)):
+            try:
+                parsed = json.loads(cand)
+                if "match_score" in parsed:
+                    result = parsed
+                    break
+            except json.JSONDecodeError:
+                continue
+    if not isinstance(result, dict) or "match_score" not in result:
+        print(f"[llm] No JSON encontrado. Raw: {content[:200]}")
+        return None
+    return {
+        "match_score": int(result.get("match_score", 0)),
+        "reason": result.get("reason", ""),
+        "dealbreaker_hit": result.get("dealbreaker_hit", ""),
+    }
+
+
+def analyze_job_ollama(job: dict, profile: dict, config: dict) -> Optional[dict]:
+    """Analiza un job con Ollama local (fallback sin rate limits)."""
+    try:
+        llm_cfg = config.get("llm", {})
+        base_url = os.environ.get("OLLAMA_BASE_URL", llm_cfg.get("ollama_base_url", OLLAMA_BASE_URL))
+        model = os.environ.get("OLLAMA_MODEL", llm_cfg.get("ollama_model", OLLAMA_MODEL))
+        prompt = _build_prompt(job, profile)
+        resp = httpx.post(
+            f"{base_url}/api/generate",
+            json={
+                "model": model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": llm_cfg.get("temperature", 0.3),
+                    "num_predict": llm_cfg.get("max_tokens", 800),
+                },
+            },
+            timeout=180,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data.get("response", "") or ""
+        return _parse_result_content(content)
+    except Exception as e:
+        print(f"[ollama] Error: {e}")
+        return None
+
+
+def analyze_job(job: dict, profile: dict, config: dict) -> Optional[dict]:
+    """Analiza un job con NIM LLM. Si falla o hay rate limit, cae a Ollama local."""
+    # Leer SIEMPRE del entorno vivo (no de la constante de módulo, que se cachea al import)
+    api_key = os.environ.get(config["llm"].get("api_key_env", "NIM_API_KEY"), "") or os.environ.get("NIM_API_KEY", "")
+    if not api_key:
+        print("[nim] WARNING: NIM_API_KEY no configurada. Usando Ollama local...")
+        return analyze_job_ollama(job, profile, config)
 
     prompt = _build_prompt(job, profile)
     payload = {
@@ -81,31 +154,48 @@ def analyze_job(job: dict, profile: dict, config: dict) -> Optional[dict]:
         "Accept": "application/json",
     }
 
+    rate_limited = False
     try:
         resp = httpx.post(NIM_URL, json=payload, headers=headers, timeout=120)
+        # Retry con backoff en rate limit (429) y sobrecarga (503)
+        for attempt in range(2):
+            if resp.status_code in (429, 503, 504):
+                rate_limited = True
+                wait = 5 * (attempt + 1)
+                print(f"[nim] HTTP {resp.status_code}, retry en {wait}s...")
+                import time
+                time.sleep(wait)
+                resp = httpx.post(NIM_URL, json=payload, headers=headers, timeout=120)
+            else:
+                break
+        if resp.status_code in (429, 503, 504):
+            rate_limited = True
+            resp.raise_for_status()
         resp.raise_for_status()
         data = resp.json()
-        content = data["choices"][0]["message"]["content"].strip()
+        content = data["choices"][0]["message"].get("content") or ""
+        if not content:
+            # deepseek a veces responde solo reasoning_content (content=null)
+            content = data["choices"][0]["message"].get("reasoning_content") or ""
+        if not content:
+            print("[nim] Empty content response, reintentando una vez...")
+            resp = httpx.post(NIM_URL, json=payload, headers=headers, timeout=120)
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"].get("content") or data["choices"][0]["message"].get("reasoning_content") or ""
 
-        # Limpieza: NIM a veces envuelve en ```json
-        if "```" in content:
-            start = content.find("{")
-            end = content.rfind("}")
-            content = content[start:end+1]
-
-        result = json.loads(content)
-        return {
-            "match_score": int(result.get("match_score", 0)),
-            "reason": result.get("reason", ""),
-            "dealbreaker_hit": result.get("dealbreaker_hit", ""),
-        }
+        result = _parse_result_content(content)
+        if result:
+            return result
     except httpx.HTTPStatusError as e:
+        rate_limited = rate_limited or e.response.status_code in (429, 503, 504)
         print(f"[nim] HTTP error {e.response.status_code}: {e.response.text[:200]}")
-        return None
-    except json.JSONDecodeError as e:
-        print(f"[nim] JSON parse error: {e}")
-        print(f"[nim] Raw output: {content[:300] if 'content' in dir() else 'N/A'}")
-        return None
     except Exception as e:
         print(f"[nim] Unexpected error: {e}")
-        return None
+
+    # Fallback: si NIM falló o hubo rate limit, usar Ollama local
+    if rate_limited:
+        print("[nim] Rate limit / sobrecarga → usando Ollama local")
+    else:
+        print("[nim] NIM falló → usando Ollama local")
+    return analyze_job_ollama(job, profile, config)

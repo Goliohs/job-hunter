@@ -19,9 +19,14 @@ with open(CONFIG_PATH) as f:
 
 def main():
     import os
+    import sys
+    # --local: forzar Ollama local (sin NIM) para evitar rate limits
+    if "--local" in sys.argv:
+        os.environ.pop("NIM_API_KEY", None)
+        print("[score] Modo LOCAL: usando Ollama (sin NIM)")
+
     if not os.environ.get("NIM_API_KEY"):
-        print("NIM_API_KEY no configurada")
-        return
+        print("[score] NIM_API_KEY no configurada — se usará Ollama local")
 
     profile = CONFIG["profile"]
     delay = float(CONFIG["filter"].get("rate_limit_seconds", 2.0))

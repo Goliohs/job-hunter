@@ -213,13 +213,16 @@ sources:
 llm:
   api_url: https://integrate.api.nvidia.com/v1/chat/completions
   api_key_env: NIM_API_KEY
-  model: deepseek-ai/deepseek-v4-flash-0731
+  model: moonshotai/kimi-k3
   temperature: 0.3
-  max_tokens: 500
+  max_tokens: 800
+  ollama_base_url: http://localhost:11434
+  ollama_model: qwen3-tuned:latest
 filter:
   min_score: 60
   high_match_threshold: 70
   max_jobs_per_run: 5
+  rate_limit_seconds: 6.0
 database:
   path: jobs.db
 alerts:
