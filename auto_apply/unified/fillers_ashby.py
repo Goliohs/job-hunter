@@ -127,6 +127,15 @@ class AshbyFiller(LeverFiller):
         # 3. Custom questions (labels UUID + radios + selects) - helpers de Lever
         await self._answer_custom_questions()
 
+        # 3b. Comboboxes (Location etc.): tipear y seleccionar sugerencia
+        await self._handle_ashby_comboboxes()
+
+        # 3c. Checkboxes de consentimiento ("I agree" / contact)
+        await self._handle_consent_checkboxes()
+
+        # 3d. Botones Yes/No toggle (Confluent etc.)
+        await self._handle_ashby_yesno_buttons()
+
         # 4. Pass2: required visibles vacíos → resolver por label
         await self._fill_missing_by_label(final_pass=True)
 
@@ -213,6 +222,17 @@ class AshbyFiller(LeverFiller):
         for keyword, answer in sorted(qa.items(), key=lambda kv: len(str(kv[0])), reverse=True):
             if str(keyword).lower() in label_lower and answer:
                 return str(answer)
+
+        # Consentimiento a recibir mensajes de texto / contacto
+        if ("consent" in label_lower or "agree" in label_lower) and ("text message" in label_lower
+                or "contact you" in label_lower or "job opportunities" in label_lower):
+            return "Yes"
+        # ¿Has trabajado antes en esta empresa?
+        if "previously" in label_lower and ("employ" in label_lower or "work" in label_lower):
+            return "No"
+        # ¿Cómo te enteraste? (mapear a "Job Board" si existe esa opción)
+        if "how did you hear" in label_lower or "hear about" in label_lower or "how did you find" in label_lower:
+            return "Job Board"
 
         # Preguntas motivacionales: usar cover letter / summary del perfil
         if "why" in label_lower and ("railway" in label_lower or "company" in label_lower
@@ -352,6 +372,168 @@ class AshbyFiller(LeverFiller):
             logger.warning(f"Ashby radio group label error: {e}")
             return None
 
+    async def _handle_ashby_comboboxes(self):
+        """Rellena comboboxes de Ashby (Location, etc.): tipear + elegir sugerencia."""
+        try:
+            combos = await self.page.query_selector_all(
+                'input[role="combobox"]:not([type="hidden"]), [class*="combobox"] input'
+            )
+            for combo in combos:
+                try:
+                    if not await combo.is_visible():
+                        continue
+                    if (await combo.input_value() or "").strip():
+                        continue
+                    label_text = await self._label_for_input(combo)
+                    answer = self._get_value_for_label(label_text)
+                    if not answer:
+                        continue
+                    await combo.click()
+                    await combo.fill(answer)
+                    await self.page.wait_for_timeout(1200)
+                    # Click en la primera sugerencia del dropdown
+                    picked = await self.page.evaluate(
+                        """() => {
+                            const els = document.querySelectorAll(
+                                '[role="option"], [role="listbox"] [role="option"], li[role="option"]'
+                            );
+                            for (const el of els) {
+                                if (el.offsetParent !== null && (el.textContent || '').trim()) {
+                                    el.click();
+                                    return el.textContent.trim();
+                                }
+                            }
+                            return null;
+                        }"""
+                    )
+                    if picked:
+                        self.filled[f"combobox:{label_text[:50]}"] = picked
+                        logger.info(f"Ashby: combobox '{label_text[:40]}' -> {picked[:40]}")
+                    else:
+                        await self.page.keyboard.press("Enter")
+                except Exception as e:
+                    logger.warning(f"Ashby combobox error: {type(e).__name__}: {e}")
+        except Exception as e:
+            logger.warning(f"Ashby combobox section error: {e}")
+
+    async def _handle_consent_checkboxes(self):
+        """Marca checkboxes de consentimiento (I agree / contact about opportunities)."""
+        try:
+            checks = await self.page.query_selector_all('input[type="checkbox"]')
+            for chk in checks:
+                try:
+                    if not await chk.is_visible():
+                        continue
+                    if await chk.is_checked():
+                        continue
+                    # Label asociado por id o ancestro
+                    label_text = ""
+                    cid = await chk.get_attribute("id")
+                    if cid:
+                        lbl = await self.page.query_selector(f'label[for="{cid}"]')
+                        if lbl:
+                            label_text = (await lbl.inner_text()) or ""
+                    if not label_text:
+                        label_text = await chk.evaluate(
+                            """el => {
+                                const p = el.closest('[class*="consent"], [class*="checkbox"], label, div');
+                                return p ? (p.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 200) : '';
+                            }"""
+                        )
+                    low = label_text.lower()
+                    if any(k in low for k in ["agree", "consent", "contact you", "job opportunities", "5 years"]):
+                        await chk.check()
+                        self.filled[f"consent:{low[:40]}"] = "agreed"
+                        logger.info(f"Ashby: checkbox consentimiento marcado ({low[:50]})")
+                except Exception as e:
+                    logger.warning(f"Ashby consent checkbox error: {e}")
+        except Exception as e:
+            logger.warning(f"Ashby consent section error: {e}")
+
+    async def _handle_ashby_yesno_buttons(self):
+        """Confluent y otros boards renderizan Yes/No como BOTONES toggle
+        (no <input type=radio>). Agrupar por pregunta y clickear la opción."""
+        try:
+            btns = await self.page.query_selector_all("button")
+            yesno = []
+            for b in btns:
+                try:
+                    t = ((await b.inner_text()) or "").strip().lower()
+                    if t in ("yes", "no") and await b.is_visible():
+                        yesno.append(b)
+                except Exception:
+                    continue
+            if not yesno:
+                return
+
+            # Agrupar por pregunta (ancestro con el texto + ambos botones)
+            groups = {}
+            for b in yesno:
+                try:
+                    info = await b.evaluate(
+                        """el => {
+                            let cur = el;
+                            for (let i = 0; i < 6 && cur; i++) {
+                                cur = cur.parentElement;
+                                if (!cur) break;
+                                const txt = (cur.textContent || '').replace(/\\s+/g, ' ').trim();
+                                const ys = [...cur.querySelectorAll('button')].filter(x =>
+                                    /^(yes|no)$/i.test((x.textContent || '').trim()));
+                                if (ys.length >= 2 && txt.length > 25) {
+                                    let q = txt;
+                                    ys.forEach(x => q = q.replace((x.textContent || '').trim(), ''));
+                                    q = q.replace(/[?*\\s]+$/, '');
+                                    const sel = [...ys].filter(x => x === el);
+                                    const selected = (el.getAttribute('aria-pressed') === 'true')
+                                        || /(selected|active|_selected)/i.test((el.className || '').toString());
+                                    return { key: q, btn: (el.textContent || '').trim(), selected };
+                                }
+                            }
+                            return null;
+                        }"""
+                    )
+                    if info:
+                        groups.setdefault(info["key"], []).append(info)
+                except Exception:
+                    continue
+
+            for question, opts in groups.items():
+                if any(o.get("selected") for o in opts):
+                    continue
+                answer = self._get_value_for_label(question)
+                if not answer:
+                    continue
+                want = "yes" if answer.lower().startswith("yes") else "no"
+                for b in yesno:
+                    try:
+                        qinfo = await b.evaluate(
+                            """el => {
+                                let cur = el;
+                                for (let i = 0; i < 6 && cur; i++) {
+                                    cur = cur.parentElement;
+                                    if (!cur) break;
+                                    const txt = (cur.textContent || '').replace(/\\s+/g, ' ').trim();
+                                    const ys = [...cur.querySelectorAll('button')].filter(x =>
+                                        /^(yes|no)$/i.test((x.textContent || '').trim()));
+                                    if (ys.length >= 2 && txt.length > 25) {
+                                        let q = txt;
+                                        ys.forEach(x => q = q.replace((x.textContent || '').trim(), ''));
+                                        return { q: q.replace(/[?*\\s]+$/, ''), btn: (el.textContent || '').trim() };
+                                    }
+                                }
+                                return null;
+                            }"""
+                        )
+                        if qinfo and qinfo["q"] == question and qinfo["btn"].lower() == want:
+                            await b.click()
+                            self.filled[f"yesno:{question[:50]}"] = want
+                            logger.info(f"Ashby: botón yes/no '{question[:40]}' -> {want}")
+                            break
+                    except Exception:
+                        continue
+        except Exception as e:
+            logger.warning(f"Ashby yesno buttons error: {e}")
+
     async def validate(self) -> FillResult:
         """Valida errores visibles y required vacíos."""
         self.errors = []
@@ -418,8 +600,18 @@ class AshbyFiller(LeverFiller):
             try:
                 body = (await self.page.inner_text("body", timeout=3000)).lower()
                 if "needs corrections" in body or "missing entry" in body:
-                    logger.warning("Ashby: form needs corrections - re-filling and retrying")
+                    # Logging del detalle: qué campos pide Ashby corregir
+                    detail = await self.page.evaluate(
+                        """() => {
+                            const sel = document.querySelector('[class*="corrections"], [class*="modal"], [role="dialog"], [class*="error"]');
+                            return sel ? (sel.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 500) : '';
+                        }"""
+                    )
+                    logger.warning(f"Ashby: form needs corrections - re-filling. Detalle: {detail or body[:300]}")
                     await self._answer_custom_questions()
+                    await self._handle_ashby_comboboxes()
+                    await self._handle_consent_checkboxes()
+                    await self._handle_ashby_yesno_buttons()
                     await self._fill_missing_by_label(final_pass=True)
                     await self.page.wait_for_timeout(2500)
                     await self._fill_missing_by_label(final_pass=True)

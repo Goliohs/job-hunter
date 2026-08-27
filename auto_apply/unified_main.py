@@ -77,6 +77,8 @@ async def run_auto_apply_unified(
         "question_answers": profile.get("question_answers", {}),
         "english_level": profile.get("english_level", "Advanced"),
         "years_experience": str(profile.get("years_experience", 5)) + "+",
+        "current_company": profile.get("current_company", ""),
+        "how_heard_answer": profile.get("how_heard_answer", "Job posting"),
         "cover_letter": profile.get("cover_letter", ""),
         "why_answer": profile.get("why_answer", ""),
         "cv_path": str(Path(__file__).parent.parent / "cv.md"),
