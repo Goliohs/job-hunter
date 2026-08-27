@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 # Asegurar que job-hunter está en path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from auto_apply.unified.orchestrator import apply_to_job, ApplicationOrchestrator
 from auto_apply.unified.session import BrowserSessionManager
@@ -176,7 +176,7 @@ def main():
     parser = argparse.ArgumentParser(description="Unified Auto-Apply")
     parser.add_argument("--score", type=int, default=70, help="Min score")
     parser.add_argument("--max", type=int, default=5, help="Max applications")
-    parser.add_argument("--semi", action="store_true", default=True, help="Semi-auto mode")
+    parser.add_argument("--semi", action="store_true", default=False, help="Semi-auto mode (espera aprobación humana)")
     parser.add_argument("--headless", action="store_true", help="Headless browser")
     parser.add_argument("--job-id", type=int, help="Specific job ID")
     
