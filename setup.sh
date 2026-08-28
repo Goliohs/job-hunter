@@ -69,7 +69,7 @@ echo "✅ All required variables configured!"
 # Test email
 echo ""
 echo "Testing email notification..."
-cd /home/Helios/job-hunter
+cd "$(dirname "${BASH_SOURCE[0]}")"
 source venv/bin/activate
 python3 -c "
 from alerts.email_notifier import EmailNotifier
@@ -99,7 +99,7 @@ echo ""
 echo "✅ Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Add to crontab: (crontab -l; echo '0 8 * * * cd /home/Helios/job-hunter && ./run.sh') | crontab -"
+echo "1. Add to crontab: (crontab -l; echo '0 8 * * * cd "$(dirname "${BASH_SOURCE[0]}")" && ./run.sh') | crontab -"
 echo "2. Or run manually: ./run.sh"
 echo ""
 echo "Dashboard: ./run.sh web (port 5001)"

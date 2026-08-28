@@ -220,7 +220,7 @@ class GreenhouseATS:
         elif "portfolio" in label_text or "website" in label_text or "personal site" in label_text:
             return profile.get("portfolio", "")
         elif "location" in label_text or "current location" in label_text:
-            return profile.get("location", "Costa Rica")
+            return profile.get("location", "Your Country")
         elif "postgres" in label_text and ("year" in label_text or "experience" in label_text):
             return "10+ years managing Postgres clusters, extensions, replication, and performance tuning"
         elif "sponsor" in label_text or "visa" in label_text or "work authoriz" in label_text:
@@ -241,7 +241,7 @@ class GreenhouseATS:
         label_text = label_text.lower()
         
         if "country" in label_text:
-            return profile.get("location", "Costa Rica").split(",")[0].strip()
+            return profile.get("location", "Your Country").split(",")[0].strip()
         elif "gender" in label_text:
             return "Male"
         elif "hispanic" in label_text or "latino" in label_text:

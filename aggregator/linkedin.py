@@ -7,6 +7,7 @@ import re
 from bs4 import BeautifulSoup
 
 
+from pathlib import Path
 LINKEDIN_SEARCH_URLS = {
     "devops_remote": "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=devops%20OR%20site%20reliability%20OR%20platform%20engineer&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0",
     "fullstack_remote": "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=full%20stack%20OR%20backend%20OR%20python%20OR%20golang&location=Remote&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0",
@@ -109,7 +110,7 @@ if __name__ == "__main__":
     import yaml
     from bs4 import BeautifulSoup
     
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     
     results = fetch_all_linkedin_jobs(config)

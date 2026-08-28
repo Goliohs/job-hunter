@@ -31,7 +31,7 @@ HANDLERS = {
 def build_candidate_from_config(config: dict, cv_path: str, cover_letter_path: Optional[str] = None) -> CandidateProfile:
     """Construye CandidateProfile desde el config.yaml."""
     p = config["profile"]
-    full = f"{p.get('first_name', 'Oscar')} {p.get('last_name', '')}".strip()
+    full = f"{p.get('first_name', 'YourName')} {p.get('last_name', '')}".strip()
     return CandidateProfile(
         full_name=full,
         email=p.get("email", ""),

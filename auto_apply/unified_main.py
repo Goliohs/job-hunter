@@ -27,7 +27,7 @@ from job_data import job_folder_manager
 
 # Cargar configuración
 import yaml
-with open("/home/Helios/job-hunter/config.yaml") as f:
+with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
     CONFIG = yaml.safe_load(f)
 
 

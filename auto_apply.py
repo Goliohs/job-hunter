@@ -405,16 +405,16 @@ if __name__ == "__main__":
     if job:
         job = dict(job)
         profile = {
-            "first_name": "Oscar",
+            "first_name": "YourName",
             "last_name": "DevOps",
-            "email": "oscar@example.com",
-            "phone": "+506 1234 5678",
+            "email": "yourname@example.com",
+            "phone": "+000 1234 5678",
             "linkedin": "https://linkedin.com/in/tuusuario",
             "github": "https://github.com/tuusuario",
-            "portfolio": "https://services.o7team.us",
+            "portfolio": "https://your-portfolio.example.com",
             "cover_letter": "Experienced DevOps Architect...",
         }
-        result = auto_apply_job(job, profile, "/home/Helios/cv.pdf", headless=False)
+        result = auto_apply_job(job, profile, "/home/youruser/cv.pdf", headless=False)
         print(result)
     else:
         print("No hay jobs para aplicar")

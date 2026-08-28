@@ -282,7 +282,7 @@ class ATSBaseFiller(ABC):
         """Toma screenshot."""
         try:
             from pathlib import Path
-            path = Path("/home/Helios/job-hunter/screenshots") / f"{self.__class__.__name__}_{name}.png"
+            path = Path(__file__).resolve().parent.parent.parent / "screenshots" / f"{self.__class__.__name__}_{name}.png"
             path.parent.mkdir(parents=True, exist_ok=True)
             await self.page.screenshot(path=str(path), full_page=True)
             return str(path)

@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 import time
 
 
+from pathlib import Path
 COMPANY_CAREER_PAGES = {
     # Tech companies with good career pages
     "canonical": "https://careers.canonical.com/jobs",
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     import yaml
     from datetime import datetime
     
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     
     jobs = fetch({"sources": {"company_career_pages": {"enabled": True}}})

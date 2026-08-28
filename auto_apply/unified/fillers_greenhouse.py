@@ -14,6 +14,7 @@ import logging
 import re
 from datetime import datetime, timedelta, timezone
 
+from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
@@ -174,9 +175,9 @@ class GreenhouseFiller(ATSBaseFiller):
                 else:
                     print(f"[greenhouse] ✗ Failed to fill {field_id}")
 
-        # Country code for phone (separate field in Greenhouse) - phone country code +506
-        print(f"[greenhouse] Filling phone country code combobox (+506 Costa Rica)")
-        await self._fill_combobox("input#country", "Costa Rica")
+        # Country code for phone (separate field in Greenhouse) - phone country code +000
+        print(f"[greenhouse] Filling phone country code combobox (+000 Your Country)")
+        await self._fill_combobox("input#country", "Your Country")
 
         # 2. Los demás campos de texto (LinkedIn, GitHub, location, etc.) se llenan
         # en el paso 3 buscando por label - cubre required y opcionales.
@@ -244,7 +245,7 @@ class GreenhouseFiller(ATSBaseFiller):
                 pass
 
         # 6. Subir CV
-        cv_path = self.candidate_data.get("cv_path", "/home/Helios/job-hunter/cv.txt")
+        cv_path = self.candidate_data.get("cv_path", str(Path(__file__).resolve().parent.parent.parent / "cv.txt"))
         if cv_path:
             print(f"[greenhouse] Uploading CV from: {cv_path}")
             await self._upload_file('input#resume, input[type="file"][name="resume"], input[type="file"]', cv_path)
@@ -471,7 +472,7 @@ class GreenhouseFiller(ATSBaseFiller):
         if "portfolio" in label_lower or "website" in label_lower or "personal site" in label_lower:
             return self.candidate_data.get("portfolio", "")
         if "location" in label_lower or "ciudad" in label_lower:
-            return self.candidate_data.get("location", "Costa Rica")
+            return self.candidate_data.get("location", "Your Country")
         if "postgres" in label_lower and ("year" in label_lower or "experience" in label_lower):
             return "10+ years managing Postgres clusters, extensions, replication, performance tuning"
         if "year" in label_lower and "experience" in label_lower:

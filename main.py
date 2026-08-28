@@ -22,7 +22,7 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
 from db.store import init_db, save_job, update_match, get_stats, get_top_jobs, log_run, get_jobs_for_apply
-from aggregator import remotive, remoteok, wwr, hn, ats_career, company_career, lever, wellfound, yc_jobs, playwright_scraper
+from aggregator import remotive, remoteok, wwr, hn, ats_career, company_career, lever, wellfound, yc_jobs, playwright_scraper, upwork, freelancer
 from aggregator.linkedin import fetch_all_linkedin_jobs
 from aggregator.linkedin_easy_apply import fetch_linkedin_jobs
 from aggregator.standard_ats import fetch_all_standard_ats_jobs
@@ -134,6 +134,16 @@ def run_aggregators(config: dict) -> dict:
         print("[playwright] Fetching YC Jobs...")
         jobs = playwright_scraper.fetch_yc_jobs(sources["yc_jobs"].get("max_pages", 3))
         all_results["yc_jobs_pw"] = jobs
+
+    # Upwork via RSS feeds (sin login, sin scraping, sin riesgo de ban)
+    if sources.get("upwork", {}).get("enabled"):
+        jobs = upwork.fetch(sources["upwork"])
+        all_results["upwork"] = jobs
+
+    # Freelancer.com via API publica (sin login, sin riesgo de ban)
+    if sources.get("freelancer", {}).get("enabled"):
+        jobs = freelancer.fetch(sources["freelancer"])
+        all_results["freelancer"] = jobs
 
     return all_results
 
@@ -269,15 +279,15 @@ def run_auto_apply(config: dict):
     profile = config["profile"]
 
     # Build CandidateProfile
-    cv_path = os.environ.get("CV_PATH", "/home/Helios/job-hunter/cv.pdf")
+    cv_path = os.environ.get("CV_PATH", str(Path(__file__).resolve().parent / "cv.pdf"))
     if not os.path.exists(cv_path):
-        cv_path = "/home/Helios/job-hunter/cv.txt"
+        cv_path = str(Path(__file__).resolve().parent / "cv.txt")
         if not os.path.exists(cv_path):
             print(f"ERROR: CV no encontrado en {cv_path}")
             return
 
     candidate = {
-        "first_name": profile.get("first_name", "Oscar"),
+        "first_name": profile.get("first_name", "YourName"),
         "last_name": profile.get("last_name", ""),
         "email": profile.get("email", ""),
         "phone": profile.get("phone", ""),

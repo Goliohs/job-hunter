@@ -33,7 +33,7 @@ class AccountManager:
         self.session_manager = session_manager
         self.config = config or {}
         self.email_config = config.get("email", {}) if config else {}
-        self.accounts_file = Path("/home/Helios/job-hunter/accounts.json")
+        self.accounts_file = Path(__file__).resolve().parent.parent.parent / "accounts.json"
         self.accounts = self._load_accounts()
     
     def _load_accounts(self) -> dict:

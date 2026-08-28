@@ -32,10 +32,10 @@ class BrowserSessionManager:
     
     def __init__(
         self,
-        profile_dir: str = "/home/Helios/job-hunter/browser_profile",
+        profile_dir: str = str(Path(__file__).resolve().parent.parent.parent / "browser_profile"),
         headless: bool = False,
         viewport: dict = None,
-        screenshots_dir: str = "/home/Helios/job-hunter/screenshots",
+        screenshots_dir: str = str(Path(__file__).resolve().parent.parent.parent / "screenshots"),
         user_agent: str = None,
     ):
         self.profile_dir = Path(profile_dir)

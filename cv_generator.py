@@ -17,8 +17,8 @@ import yaml
 from pathlib import Path
 from datetime import datetime
 
-PROFILE_YAML = Path("/home/Helios/.job-hunter/profile.yaml")
-OUTPUT_DIR = Path("/home/Helios/job-hunter/generated_cvs")
+PROFILE_YAML = Path("/home/youruser/.job-hunter/profile.yaml")
+OUTPUT_DIR = Path(__file__).resolve().parent / "generated_cvs"
 
 # Intentar motores
 try:
@@ -313,7 +313,7 @@ def generate_job_cv(job: dict, output_dir: Path = None) -> str:
         return str(out_path)
 
     print("[cv_gen] WARNING: no PDF engine available, usando cv.txt")
-    return "/home/Helios/job-hunter/cv.txt"
+    return str(Path(__file__).resolve().parent / "cv.txt")
 
 
 if __name__ == "__main__":

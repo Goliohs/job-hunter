@@ -205,6 +205,29 @@ sources:
   yc_jobs_pw:
     enabled: true
     max_pages: 3
+  upwork:
+    enabled: false  # Upwork mato RSS feeds el 2024-08-20. Deshabilitado por defecto.
+    # Para monitorear Upwork en 2026, usa Vibeworker (tryvibeworker.com) como
+    # servicio de terceros que reconstruye el feed como RSS.
+    # Configurar manualmente si se integra Vibeworker despues.
+    sort: recency
+    searches:
+      docker_devops: docker kubernetes devops server migration
+      python_automation: python automation scraping api
+  freelancer:
+    enabled: true
+    limit: 20
+    searches:
+      docker_devops: docker kubernetes devops server migration
+      python_automation: python automation scraping api
+      dockerize_app: dockerize containerize application
+      ci_cd_setup: CI CD pipeline github actions gitlab
+      monitoring_setup: prometheus grafana monitoring setup
+      postgresql_setup: postgresql database setup replication
+      wordpress_docker: wordpress docker migrate optimize
+      n8n_automation: n8n automation workflow setup
+      nginx_haproxy: nginx haproxy reverse proxy ssl
+      linux_server: linux server hardening setup administration
   ats_career_pages:
     enabled: true
     greenhouse: *id001

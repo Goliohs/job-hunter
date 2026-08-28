@@ -89,7 +89,7 @@ def open_quick_apply(job_id: int, headless: bool = False):
     
     # Generate application package
     package = generate_application_package(job, profile)
-    cv_path = "/home/Helios/job-hunter/cv.txt"
+    cv_path = str(Path(__file__).resolve().parent.parent / "cv.txt")
     pdf_files = generate_application_pdfs(job, package, profile, cv_path)
     
     # Generate apply URL

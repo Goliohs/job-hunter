@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 import re
 
 
+from pathlib import Path
 def is_remote_job(text: str) -> bool:
     """Check if job text indicates remote work."""
     text_lower = text.lower()
@@ -474,7 +475,7 @@ def fetch_company_careers(company: str, url: str, max_pages: int = 3) -> List[Di
 
 if __name__ == "__main__":
     import yaml
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     
     # Test Wellfound

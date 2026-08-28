@@ -82,7 +82,7 @@ async def query(question: str):
 3. Correr script de embedding una vez (toma 5 min)
 4. Exponer via FastAPI en tu servidor
 5. Probar con 5 preguntas (ejemplos arriba)
-6. Documentar en blog/services.o7team.us
+6. Documentar en blog/https://your-portfolio.example.com
 
 ## Total tiempo: 2-3 horas
 ## Total costo: 0$ (tu GPU ya corre 24/7)

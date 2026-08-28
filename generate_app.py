@@ -19,7 +19,7 @@ def main():
     init_db()
     conn = get_conn()
 
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent / "config.yaml") as f:
         config = yaml.safe_load(f)
 
     profile = config["profile"]

@@ -8,7 +8,7 @@
 
 set -u
 MODE="${1:-all}"
-BASE="/home/Helios/job-hunter"
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$BASE" || exit 1
 
 source venv/bin/activate

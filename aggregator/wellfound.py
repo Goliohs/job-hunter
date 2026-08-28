@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
 
+from pathlib import Path
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -170,7 +171,7 @@ def fetch(config: dict) -> List[Dict]:
 
 if __name__ == "__main__":
     import yaml
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     
     # Test with enabled

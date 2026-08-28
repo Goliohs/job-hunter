@@ -270,7 +270,7 @@ def adapt_cv(job: Dict, profile: Dict, base_cv: str) -> Optional[Dict]:
     return _adapt_cv_fallback(job, profile, base_cv)
 
 
-def load_base_cv(path: str = "/home/Helios/job-hunter/cv.txt") -> str:
+def load_base_cv(path: str = str(Path(__file__).resolve().parent.parent / "cv.txt")) -> str:
     """Carga CV base."""
     try:
         return Path(path).read_text()
@@ -306,7 +306,7 @@ def generate_application_package(job: Dict, profile: Dict, cv_path: str = None) 
     return results
 
 
-def save_application_files(job: Dict, package: Dict, output_dir: str = "/home/Helios/job-hunter/applications") -> Dict[str, str]:
+def save_application_files(job: Dict, package: Dict, output_dir: str = str(Path(__file__).resolve().parent.parent / "applications")) -> Dict[str, str]:
     """Guarda cover letter y CV adaptado como archivos."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
@@ -489,7 +489,7 @@ def generate_cv_pdf(job: Dict, package: Dict, profile: Dict, output_path: str) -
         return False
 
 
-def generate_application_pdfs(job: Dict, package: Dict, profile: Dict, output_dir: str = "/home/Helios/job-hunter/applications") -> Dict[str, str]:
+def generate_application_pdfs(job: Dict, package: Dict, profile: Dict, output_dir: str = str(Path(__file__).resolve().parent.parent / "applications")) -> Dict[str, str]:
     """Genera PDFs de cover letter y CV adaptado."""
     if not WEASYPRINT_AVAILABLE:
         print("[generator] WeasyPrint no disponible, saltando PDF")
@@ -517,7 +517,7 @@ def generate_application_pdfs(job: Dict, package: Dict, profile: Dict, output_di
 if __name__ == "__main__":
     # Test
     import yaml
-    with open("/home/Helios/job-hunter/config.yaml") as f:
+    with open(Path(__file__).resolve().parent.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     
     profile = config["profile"]

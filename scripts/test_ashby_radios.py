@@ -11,14 +11,14 @@ from auto_apply.unified.fillers_ashby import AshbyFiller
 JOB_URL = "https://jobs.ashbyhq.com/livekit/1355f64e-b394-4982-8de6-6fd3e6e8f30d/application"
 
 CANDIDATE = {
-    "first_name": "Oscar", "last_name": "Alfaro Porras",
-    "email": "goliohs@o7outlet.com", "phone": "87833158",
-    "linkedin": "https://linkedin.com/in/ozdevops", "github": "https://github.com/Goliohs",
-    "portfolio": "https://services.o7team.us", "location": "Costa Rica",
+    "first_name": "YourName", "last_name": "",
+    "email": "your@email.com", "phone": "0000000",
+    "linkedin": "https://linkedin.com/in/youruser", "github": "https://github.com/yourgithub",
+    "portfolio": "https://your-portfolio.example.com", "location": "Your Country",
     "visa_status": "No visa required for remote work", "notice_period": "Immediate",
     "salary_expectation": "Negotiable", "years_experience": "10+",
     "english_level": "Advanced", "why_answer": "Me encanta la infraestructura distribuida...",
-    "cover_letter": "Soy ingeniero DevOps con 10+ años...", "cv_path": "/home/Helios/job-hunter/cv.pdf",
+    "cover_letter": "Soy ingeniero DevOps con 10+ años...", "cv_path": str(Path(__file__).resolve().parent.parent / "cv.pdf"),
 }
 
 
